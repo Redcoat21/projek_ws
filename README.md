@@ -4,23 +4,25 @@
 -   Cara ngepushnya bikin branch baru pake `git checkout -b <nama_branch>`
 -   Untuk lengkapnya soal git bisa baca di bagian `Appendix`
 -   Di project ini harusnya gaada file `.env` silahkan dibikin sendiri dan taruh filenya di folder paling luar, strukturnya
+
+    ```.env
+    APP_HOST=       # default: localhost
+    APP_PORT=       # default: 3000
+
+    DB_HOST=        # default: localhost
+    DB_PORT=        # default: 3306
+    DB_NAME=        # default: projek_ws
+    DB_USER=        # default: root
+    DB_PASSWORD=    # default: <kosong>
+
+
+    DATABASE_URL="mysql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>"
+    ```
+
 -   Di repo githubnya untuk branch `master` (jadi setiap pull request) bakalan dilakukan job sesuai workflow di Github Actionnya
     -   Intinya sih setiap pull request ke branch `master` bakal dilakuin sebuah unit test, yang dimana kalau testnya gagal gak bakal di merge
     -   Jadi bisa tolong diperhatiin kalau mau aman, setiap ngelakuin perubahan major bisa lakuin `npm run test`
 -   PASTIKAN SEBELUM PUSH KE REPOSITORY, SUDAH RUN `npm run test` KALAU TIDAK MAU GANTINYA DI AKHIR AKHIR
-
-```.env
-APP_HOST=       # default: localhost
-APP_PORT=       # default: 3000
-
-DB_HOST=        # default: localhost
-DB_PORT=        # default: 3306
-DB_NAME=        # default: projek_ws
-DB_USER=        # default: root
-DB_PASSWORD=    # default: <kosong>
-
-
-```
 
 # Quality Of Life Tools
 
