@@ -21,9 +21,9 @@ jobs:
             - name: Setup MySQL
               uses: mirromutth/mysql-action@v1.1
               with:
-                  mysql user: projek_ws
-                  mysql password: projek_ws
-                  mysql database: projek_ws
+                  mysql user: ${{ secrets.DB_USER }}
+                  mysql password: ${{ secrets.DB_PASSWORD }}
+                  mysql database: ${{ vars.DB_NAME }}
 
             - name: Install dependencies
               run: npm install && npm ci
@@ -31,8 +31,8 @@ jobs:
             - name: Run tests
               run: npm test
               env:
-                  DB_HOST: ${{ env.DB_HOST }}
-                  DB_PORT: ${{ env.DB_PORT }}
-                  DB_NAME: ${{ env.DB_NAME }}
+                  DB_HOST: ${{ vars.DB_HOST }}
+                  DB_PORT: ${{ vars.DB_PORT }}
+                  DB_NAME: ${{ vars.DB_NAME }}
                   DB_USER: ${{ secrets.DB_USER }}
                   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
