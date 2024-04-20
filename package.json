@@ -24,6 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.4.4",
     "mysql2": "^3.9.6",
+    "prisma": "^5.12.1",
     "sequelize": "^6.37.3",
     "supertest": "^6.3.4"
   },
