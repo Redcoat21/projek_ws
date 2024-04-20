@@ -7,6 +7,7 @@
 -   Di repo githubnya untuk branch `master` (jadi setiap pull request) bakalan dilakukan job sesuai workflow di Github Actionnya
     -   Intinya sih setiap pull request ke branch `master` bakal dilakuin sebuah unit test, yang dimana kalau testnya gagal gak bakal di merge
     -   Jadi bisa tolong diperhatiin kalau mau aman, setiap ngelakuin perubahan major bisa lakuin `npm run test`
+-   PASTIKAN SEBELUM PUSH KE REPOSITORY, SUDAH RUN `npm run test` KALAU TIDAK MAU GANTINYA DI AKHIR AKHIR
 
 ```.env
 APP_HOST=       # default: localhost
@@ -61,15 +62,6 @@ Command diatas diketikkan di terminal
 **KALAU RAGU PILIH AJA YANG DEVELOPMENT** `npm run dev`
 
 # Import
-
-## Import database
-
-Database bisa diimport pake
-
-```javascript
-const sequelize = require("./src/database");
-// Ini import databasenya yang bisa dipake nanti
-```
 
 ## Import app express
 
