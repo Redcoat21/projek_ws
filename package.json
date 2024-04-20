@@ -6,13 +6,15 @@
   "scripts": {
     "test": "npx jest",
     "build": "node src/index",
-    "dev": "npx nodemon src/index"
+    "dev": "npx nodemon src/index",
+    "migrate": "npx prisma migrate dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@joi/date": "^2.1.0",
+    "@prisma/client": "^5.12.1",
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "chalk": "^4.1.2",
@@ -24,6 +26,7 @@
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.4.4",
     "mysql2": "^3.9.6",
+    "prisma": "^5.12.1",
     "sequelize": "^6.37.3",
     "supertest": "^6.3.4"
   },

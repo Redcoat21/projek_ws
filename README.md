@@ -7,6 +7,7 @@
 -   Di repo githubnya untuk branch `master` (jadi setiap pull request) bakalan dilakukan job sesuai workflow di Github Actionnya
     -   Intinya sih setiap pull request ke branch `master` bakal dilakuin sebuah unit test, yang dimana kalau testnya gagal gak bakal di merge
     -   Jadi bisa tolong diperhatiin kalau mau aman, setiap ngelakuin perubahan major bisa lakuin `npm run test`
+-   PASTIKAN SEBELUM PUSH KE REPOSITORY, SUDAH RUN `npm run test` KALAU TIDAK MAU GANTINYA DI AKHIR AKHIR
 
 ```.env
 APP_HOST=       # default: localhost
@@ -61,15 +62,6 @@ Command diatas diketikkan di terminal
 **KALAU RAGU PILIH AJA YANG DEVELOPMENT** `npm run dev`
 
 # Import
-
-## Import database
-
-Database bisa diimport pake
-
-```javascript
-const sequelize = require("./src/database");
-// Ini import databasenya yang bisa dipake nanti
-```
 
 ## Import app express
 
@@ -128,42 +120,24 @@ app.use("/api/user", userRouter); ❌
 
 # Model
 
+## Note
+
+Untuk ORM kita gak pake `sequelize` jadinya, pakenya `prisma`, gpp ga seberapa susah kok, kebanyakan syntaxnya mirip mirip.
+
 ## How to create model
 
-Sama halnya kayak router, model yang dibuat hanya boleh 1 level! dan pastikan penamaan filenya sesuai dengan penamaan modelnya.
-
-Disarankan nama filenya huruf kecil semua
-
-```javascript
-//File user.js
-//Model User ✅
-
-//File user.js
-//Model Users ❌ (PERHATIKAN S DIBELAKANGNYA)
-
-//File product.js
-//Model Product ✅
-
-//File product.js
-//Model Produk ❌
-```
+Karena pake prisma, model prisma di define di `schema.prisma`, ini gausah disentuh gpp kalau ga ngerti caranya.
 
 ## Importing Model
 
 Model bisa diimport dengan cara
 
 ```javascript
-// Misalnya mau import model User
-// WAJIB DI DESTRUCTURE!
-const { User } = require("./src/models"); ✅
-const User = require("./src/models"); ❌
+const prisma = require("./src/database");
+
+// Akses model user
+prisma.user.findMany();
 ```
-
-## Registering Model
-
-File model yang udah dibuat udah otomatis didaftarkan di `models/index.js`, nantinya tinggal pake aja
-
-**TIDAK DISARANKAN UNTUK MENGEDIT `models/index.js`, KECUALI KALAU PENTING ATAU TAU APA YANG MAU DIUBAH!**
 
 # Config
 
