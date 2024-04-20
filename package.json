@@ -23,6 +23,7 @@
     "jest": "^29.7.0",
     "joi": "^17.12.3",
     "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.4.4",
     "mysql2": "^3.9.6",
     "sequelize": "^6.37.3",
     "supertest": "^6.3.4"
