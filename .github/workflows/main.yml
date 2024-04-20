@@ -28,6 +28,9 @@ jobs:
             - name: Install dependencies
               run: npm install && npm ci
 
+            - name: Setup Prisma
+              run: npx prisma generate
+
             - name: Run tests
               run: npm test
               env:
@@ -36,3 +39,4 @@ jobs:
                   DB_NAME: ${{ vars.DB_NAME }}
                   DB_USER: ${{ secrets.DB_USER }}
                   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+                  DATABASE_URL: ${{ secrets.DATABASE_URL }}
