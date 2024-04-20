@@ -132,17 +132,19 @@ app.use("/api/user", userRouter); ❌
 
 Sama halnya kayak router, model yang dibuat hanya boleh 1 level! dan pastikan penamaan filenya sesuai dengan penamaan modelnya.
 
+Disarankan nama filenya huruf kecil semua
+
 ```javascript
-//File User.js
+//File user.js
 //Model User ✅
 
-//File User.js
+//File user.js
 //Model Users ❌ (PERHATIKAN S DIBELAKANGNYA)
 
-//File Product.js
+//File product.js
 //Model Product ✅
 
-//File Product.js
+//File product.js
 //Model Produk ❌
 ```
 
