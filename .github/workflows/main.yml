@@ -10,6 +10,7 @@ on:
 
 jobs:
     build:
+        name: Build and Test
         environment: development
         runs-on: ubuntu-latest
         steps:
