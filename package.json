@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npx jest",
     "build": "node src/index",
-    "dev": "npx nodemon src/index"
+    "dev": "npx nodemon src/index",
+    "migrate": "npx prisma migrate dev"
   },
   "keywords": [],
   "author": "",
