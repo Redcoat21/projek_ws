@@ -1,9 +1,9 @@
 const fs = require("fs");
 const path = require("path");
-const app = require("../../src/app");
+
 const chalk = require("chalk");
 
-const routesParser = () => {
+const routesParser = (app) => {
     const routesPath = path.join(__dirname, "../../src/routes");
     const routeFiles = fs
         .readdirSync(routesPath)
@@ -22,7 +22,8 @@ const routesParser = () => {
     return routes;
 };
 
-const registerRoute = () => {
+const registerRoute = (application) => {
+    const app = application;
     const prefix = "/api";
 
     const routes = routesParser();
@@ -30,14 +31,16 @@ const registerRoute = () => {
         const routeGroup = `${prefix}/${route.group}`;
         app.use(routeGroup, route.route);
         console.log(
-            chalk.bold("Registered route group: ") +
-                chalk.bold(chalk.green(`/${route.group}`))
+            chalk.bold(
+                chalk.bgBlue("[APP INFO]:"),
+                chalk.blue("Registered route group:"),
+                chalk.green(`${routeGroup}`)
+            )
         );
     }
-};
 
-registerRoute();
-routesParser();
+    return application;
+};
 
 module.exports = {
     registerRoute,
