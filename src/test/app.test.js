@@ -16,7 +16,6 @@ afterEach(async () => {
 
 describe("Test the default endpoint", () => {
     test("Should return success with status code of 200", () => {
-        console.log(request(app).get("/api/test/"));
         return request(app).get("/api/test/").expect(200);
     });
 });
