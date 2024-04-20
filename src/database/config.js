@@ -1,10 +1,10 @@
 const { DB_DIALECT, DB_HOST, DB_PORT, DB_NAME, DB_USER } = require("../config");
-const sequelize = require("./db");
+const prisma = require("./db");
 const chalk = require("chalk");
 
 const startDatabase = async () => {
     try {
-        await sequelize.authenticate();
+        await prisma.$connect();
 
         console.log(
             chalk.bold(
@@ -34,6 +34,6 @@ const startDatabase = async () => {
 };
 
 const stopDatabase = async () => {
-    await sequelize.close();
+    await prisma.$disconnect();
 };
 module.exports = { startDatabase, stopDatabase };
