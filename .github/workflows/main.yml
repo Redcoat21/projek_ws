@@ -1,0 +1,38 @@
+name: Projek WS Continuous Integarion
+
+on:
+    pull_request:
+        branches:
+            - master
+    push:
+        branches:
+            - master
+
+jobs:
+    build:
+        environment: development
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up NodeJS v.18
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "18"
+            - name: Set up MySQL
+              uses: shogo82148/actions-setup-mysql@v1
+              with:
+                  mysql-version: "8.0"
+                  root-password: ${{ secrets.DB_PASSWORD }}
+            - run: mysql -uroot -e 'SELECT version()'
+
+            - name: Install dependencies
+              run: npm install && npm ci
+
+            - name: Run tests
+              run: npm test
+              env:
+                  DB_HOST: ${{ env.DB_HOST }}
+                  DB_PORT: ${{ env.DB_PORT }}
+                  DB_NAME: ${{ env.DB_NAME }}
+                  DB_USER: ${{ secrets.DB_USER }}
+                  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
