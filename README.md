@@ -122,23 +122,30 @@ app.use("/api/user", userRouter); ❌
 
 # Model
 
-## Note
-
-Untuk ORM kita gak pake `sequelize` jadinya, pakenya `prisma`, gpp ga seberapa susah kok, kebanyakan syntaxnya mirip mirip.
-
 ## How to create model
 
-Karena pake prisma, model prisma di define di `schema.prisma`, ini gausah disentuh gpp kalau ga ngerti caranya.
+Dibikin dengan file di `src/models`, Pastikan nama filenya sesuai dengan nama modelnya! Dan pastikan nama filenya awalnya kapital!
+
+| File Name | Model Name | Status |
+| --------- | ---------- | ------ |
+| user.js   | user       | ❌     |
+| user.js   | User       | ❌     |
+| User.js   | user       | ❌     |
+| User1.js  | User       | ❌     |
+| User.js   | User       | ✅     |
+
+## Registering Model
+
+Model tidak usah di register (gausah di .associate() atau apa), soalnya udah di auto register, yeeey :)
+Pokoknya bikin aja nanti tinggal import import
 
 ## Importing Model
 
 Model bisa diimport dengan cara
 
 ```javascript
-const prisma = require("./src/database");
-
-// Akses model user
-prisma.user.findMany();
+// WAJIB DI DESTRUCTURE, KALO GAK BAKAL ERROR
+const { User } = require("./src/models");
 ```
 
 # Config
