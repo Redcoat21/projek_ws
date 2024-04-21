@@ -1,10 +1,9 @@
 const { DB_DIALECT, DB_HOST, DB_PORT, DB_NAME, DB_USER } = require("../config");
-const sequelize = require("./db");
 const chalk = require("chalk");
 
-const startDatabase = async () => {
+const startDatabase = async (db) => {
     try {
-        await sequelize.authenticate();
+        await db.authenticate();
 
         console.log(
             chalk.bold(
@@ -14,11 +13,16 @@ const startDatabase = async () => {
                 )
             )
         );
+
         console.log(
             chalk.bold(
                 chalk.bgGreen("[DB INFO]:"),
                 chalk.green(
-                    `${DB_DIALECT} is running on ${DB_HOST}:${DB_PORT}/${DB_NAME} AS ${DB_USER}`
+                    `${
+                        db.dialect.connectionManager.dialectName
+                    } is running on ${db.config.host ?? "sqlite"}:${
+                        db.config.port ?? "memory"
+                    }/${DB_NAME ?? ""} AS ${DB_USER ?? ""}`
                 )
             )
         );
@@ -33,7 +37,7 @@ const startDatabase = async () => {
     }
 };
 
-const stopDatabase = async () => {
-    await sequelize.close();
+const stopDatabase = async (db) => {
+    await db.close();
 };
 module.exports = { startDatabase, stopDatabase };
