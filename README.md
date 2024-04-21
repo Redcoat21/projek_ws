@@ -71,6 +71,24 @@ Command diatas diketikkan di terminal
 const app = require("./src/app");
 ```
 
+## Import Database
+
+Ada 2 jenis database disini,
+
+1. Development Database (Yang bakal kesambung ke MySQL)
+
+```javascript
+const { dbDev: sequelize } = require("./src/database");
+```
+
+2. Testing Database (Yang bakal kepake di unit testing)
+
+```javascript
+const { dbTest: sequelize } = require("./src/database");
+```
+
+Bedanya cuma yang dev pake `MySQL`, yang test pake `sqlite3`
+
 # Router
 
 ## How to create route

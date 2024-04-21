@@ -1,7 +1,8 @@
 const { startDatabase, stopDatabase } = require("./config");
-const db = require("./db");
+const { dev, test } = require("./db");
 module.exports = {
-    db: db,
+    dbDev: dev,
+    dbTest: test,
     startDatabase,
     stopDatabase,
 };

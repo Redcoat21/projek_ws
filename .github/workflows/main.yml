@@ -26,6 +26,12 @@ jobs:
                   mysql password: ${{ secrets.DB_PASSWORD }}
                   mysql database: ${{ vars.DB_NAME }}
 
+            - name: Setup SQLite environment
+              uses: ccorsi/setup-sqlite@v1.0.1
+              with:
+                  sqlite-version: 3.45.3
+                  sqlite-year: 2024
+
             - name: Install dependencies
               run: npm install && npm ci
 
