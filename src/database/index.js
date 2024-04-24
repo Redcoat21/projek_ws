@@ -1,8 +1,8 @@
-const { startDatabase, stopDatabase } = require("./config");
-const { dev, test } = require("./db");
+const { startDatabase, stopDatabase } = require("./client/config");
 module.exports = {
-    dbDev: dev,
-    dbTest: test,
+    dev: require("./client/mysql"),
+    test: require("./client/sqlite"),
+    mongo: require("./client/mongo"),
     startDatabase,
     stopDatabase,
 };
