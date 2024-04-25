@@ -11,13 +11,15 @@ const { dev, mongo, startDatabase } = require("./database");
     // UNCOMMENT UNTUK START MONGO
     await startDatabase(mongo);
 
-    app.listen(APP_PORT, () => {
-        console.log(
-            chalk.bold(
-                chalk.bgBlue("[APP INFO]:"),
-                chalk.blue("Server is running on port: ") +
-                    chalk.green(`http://${APP_HOST}:${APP_PORT}`)
-            )
-        );
-    });
+    await (async () => {
+        app.listen(APP_PORT, () => {
+            console.log(
+                chalk.bold(
+                    chalk.bgBlue("[APP INFO]:"),
+                    chalk.blue("Server is running on port: ") +
+                        chalk.green(`http://${APP_HOST}:${APP_PORT}`)
+                )
+            );
+        });
+    })();
 })();

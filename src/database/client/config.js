@@ -27,17 +27,18 @@ const sequelize = {
                 )
             );
         } catch (error) {
-            console.error(error);
-            console.log(
-                chalk.bold(
-                    chalk.bgRed("[DB ERROR]:"),
-                    chalk.red(
-                        `Database connection ${
-                            development ? dev.DB_DIALECT : test.DB_DIALECT
-                        }`
+            if (error.original.code === "ECONNREFUSED") {
+                console.log(
+                    chalk.bold(
+                        chalk.bgRed("[DB ERROR]:"),
+                        chalk.red(
+                            `Database connection ${
+                                development ? dev.DB_DIALECT : test.DB_DIALECT
+                            } failed to connect!`
+                        )
                     )
-                )
-            );
+                );
+            }
         }
     },
     stop: async (db) => {
@@ -93,6 +94,13 @@ const startDatabase = async (db) => {
         await sequelize.start(db);
     } else if (db instanceof MongoClient) {
         await mongo.start(db);
+    } else {
+        console.log(
+            chalk.bold(
+                chalk.bgRed("[DB ERROR]:"),
+                chalk.green("Invalid Database Type!")
+            )
+        );
     }
 };
 
