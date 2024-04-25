@@ -1,59 +1,38 @@
 const { Sequelize } = require("sequelize");
 const { MongoClient } = require("mongodb");
 const { NODE_ENV, dev, test } = require("../../config");
-const chalk = require("chalk");
+const { sendDbInfo, sendDbError } = require("../../../utility/messaging/log");
 
 const sequelize = {
     start: async (db) => {
         const development = NODE_ENV === "development";
         try {
             await db.authenticate();
-            console.log(
-                chalk.bold(
-                    chalk.bgBlue("[DB INFO]:"),
-                    chalk.green(
-                        `Database connection has been estabilished succesfully using ${
-                            development ? dev.DB_DIALECT : test.DB_DIALECT
-                        } at ${
-                            development
-                                ? dev.DB_HOST +
-                                  ":" +
-                                  dev.DB_PORT +
-                                  "/" +
-                                  dev.DB_NAME
-                                : dev.DB_DIALECT + ":memory"
-                        }`
-                    )
-                )
+            sendDbInfo(
+                `Database connection has been estabilished succesfully using ${
+                    development ? dev.DB_DIALECT : test.DB_DIALECT
+                } at ${
+                    development
+                        ? dev.DB_HOST + ":" + dev.DB_PORT + "/" + dev.DB_NAME
+                        : dev.DB_DIALECT + ":memory"
+                }`
             );
         } catch (error) {
             if (error.original.code === "ECONNREFUSED") {
-                console.log(
-                    chalk.bold(
-                        chalk.bgRed("[DB ERROR]:"),
-                        chalk.red(
-                            `Database connection ${
-                                development ? dev.DB_DIALECT : test.DB_DIALECT
-                            } failed to connect!`
-                        )
-                    )
+                sendDbError(
+                    `Database connection ${
+                        development ? dev.DB_DIALECT : test.DB_DIALECT
+                    } failed to connect!`
                 );
             }
         }
     },
     stop: async (db) => {
         await db.close();
-        console.log(
-            chalk.bold(
-                chalk.bgBlue("[DB INFO]:"),
-                chalk.green(
-                    `${
-                        NODE_ENV === "development"
-                            ? dev.DB_DIALECT
-                            : test.DB_DIALECT
-                    } Database connection has been closed`
-                )
-            )
+        sendDbInfo(
+            `${
+                NODE_ENV === "development" ? dev.DB_DIALECT : test.DB_DIALECT
+            } Database connection has been closed`
         );
     },
 };
@@ -62,30 +41,15 @@ const mongo = {
     start: async (client) => {
         try {
             await client.connect();
-            chalk.bold(
-                chalk.bgBlue("[DB INFO]:"),
-                chalk.green(
-                    `MongoDB connection has been estabilished succesfully`
-                )
-            );
+            sendDbInfo("MongoDB connection has been estabilished succesfully");
         } catch (error) {
             console.error(error);
-            console.log(
-                chalk.bold(
-                    chalk.bgRed("[DB ERROR]:"),
-                    chalk.red("MongoDB connection failed")
-                )
-            );
+            sendDbError("MongoDB connection failed");
         }
     },
     stop: async (client) => {
         await client.close();
-        console.log(
-            chalk.bold(
-                chalk.bgBlue("[DB INFO]:"),
-                chalk.green("MongoDB connection has been closed")
-            )
-        );
+        sendDbInfo("MongoDB connection has been closed");
     },
 };
 
@@ -95,12 +59,7 @@ const startDatabase = async (db) => {
     } else if (db instanceof MongoClient) {
         await mongo.start(db);
     } else {
-        console.log(
-            chalk.bold(
-                chalk.bgRed("[DB ERROR]:"),
-                chalk.green("Invalid Database Type!")
-            )
-        );
+        sendDbError("Invalid Database Type!");
     }
 };
 
