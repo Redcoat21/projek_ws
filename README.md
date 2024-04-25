@@ -6,17 +6,25 @@
 -   Di project ini harusnya gaada file `.env` silahkan dibikin sendiri dan taruh filenya di folder paling luar, strukturnya
 
     ```.env
-    APP_HOST=       # default: localhost
-    APP_PORT=       # default: 3000
+    DEV_DB_NAME=                  # default: projek_ws
+    DEV_DB_USER=                  # default: root
+    DEV_DB_HOST=                  # default: localhost
+    DEV_DB_PASSWORD=              # default:
+    DEV_DB_PORT=                  # default: 3306
+    DEV_DB_DIALECT=               # default: mysql
 
-    DB_HOST=        # default: localhost
-    DB_PORT=        # default: 3306
-    DB_NAME=        # default: projek_ws
-    DB_USER=        # default: root
-    DB_PASSWORD=    # default: <kosong>
+    TEST_DB_NAME=                 # default: projek_ws
+    TEST_DB_DIALECT=              # default: sqlite
 
+    MONGO_DB_NAME=                # default: projek_ws
+    MONGO_DB_HOST=                # default: localhost
+    MONGO_DB_PORT=                # default: 27017
 
-    DATABASE_URL="mysql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>"
+    NODE_ENV=                     # default: development
+
+    APP_HOST=                     # default: localhost
+    APP_PORT=                     # default: 3000
+
     ```
 
 -   Di repo githubnya untuk branch `master` (jadi setiap pull request) bakalan dilakukan job sesuai workflow di Github Actionnya
@@ -56,12 +64,9 @@
 # How to run
 
 -   Development: `npm run dev`
--   Production: `npm run build`
 -   Run test: `npm run test`
 
 Command diatas diketikkan di terminal
-
-**KALAU RAGU PILIH AJA YANG DEVELOPMENT** `npm run dev`
 
 # Import
 
@@ -73,21 +78,71 @@ const app = require("./src/app");
 
 ## Import Database
 
-Ada 2 jenis database disini,
+Ada 3 jenis database disini (MySQL, SQLite, MongoDB)
 
-1. Development Database (Yang bakal kesambung ke MySQL)
+Kemungkinan yang bakal sering kepake itu yang MySQL dan MongoDB
 
-```javascript
-const { dbDev: sequelize } = require("./src/database");
-```
+SQLite disini fungsinya cuma dipake buat unit testing doang
 
-2. Testing Database (Yang bakal kepake di unit testing)
+1. Import `devDatabase` alias `MySQL`
 
 ```javascript
-const { dbTest: sequelize } = require("./src/database");
+// Disini artinya kita import dev dari /src/database, dan kita rename jadi sequelize
+const { dev: sequelize } = require("/src/database");
+
+// Usage
+sequelize.query();
 ```
 
-Bedanya cuma yang dev pake `MySQL`, yang test pake `sqlite3`
+2. Import `testDatabase` alias `SQLite3`
+
+```javascript
+// Disini artinya kita import test dari /src/database, dan kita rename jadi sequelize
+const { test: sequelize } = require("/src/database");
+
+// Usage
+sequelize.query();
+```
+
+3. Import `mongo` alias `MongoDB`
+
+```javascript
+// Disini artinya kita import mongo dari /src/database, dan kita rename jadi db
+const { mongo: db } = require("/src/database");
+
+db.collection().find();
+```
+
+## Starting Database
+
+Note dengan mengimport saja tidak cukup, karena database tersebut belum di start, untuk start databasenya kita perlu import `startDatabase` dan `stopDatabase` dari `/src/database`
+
+```javascript
+// Mengimport devDatabase alias database MySQL dan startDatabase dan stopDatabase
+const {
+    dev: sequelize,
+    startDatabase,
+    stopDatabase,
+} = require("/src/database");
+
+await startDatabase(sequelize);
+
+//Kalau udah selesai
+await stopDatabase(sequelize);
+```
+
+Bisa juga untuk versi `MongoDB` nya
+
+```javascript
+const { mongo: db, startDatabase, stopDatabase } = require("/src/database");
+
+await startDatabase(db);
+
+//Kalau udah selesai
+await stopDatabase(db);
+```
+
+Normally harusnay ini gak diperlukan karena databasenya bakal di start saat `/src/index.js` dijalankan
 
 # Router
 

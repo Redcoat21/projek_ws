@@ -3,11 +3,16 @@ const path = require("path");
 
 const chalk = require("chalk");
 
-const routesParser = (app) => {
+const routesParser = () => {
     const routesPath = path.join(__dirname, "../../src/routes");
-    const routeFiles = fs
-        .readdirSync(routesPath)
-        .filter((routeFile) => routeFile.endsWith(".js"));
+
+    try {
+        const routeFiles = fs
+            .readdirSync(routesPath)
+            .filter((routeFile) => routeFile.endsWith(".js"));
+    } catch (error) {
+        return null;
+    }
 
     const routes = [];
     for (const routeFile of routeFiles) {
@@ -27,19 +32,27 @@ const registerRoute = (application) => {
     const prefix = "/api";
 
     const routes = routesParser();
-    for (const route of routes) {
-        const routeGroup = `${prefix}/${route.group}`;
-        app.use(routeGroup, route.route);
+
+    if (routes == null) {
         console.log(
             chalk.bold(
-                chalk.bgBlue("[APP INFO]:"),
-                chalk.blue("Registered route group:"),
-                chalk.green(`${routeGroup}`)
+                chalk.bgRed("[APP ERROR]:"),
+                chalk.red("No route files found in src/routes")
             )
         );
+    } else {
+        for (const route of routes) {
+            const routeGroup = `${prefix}/${route.group}`;
+            app.use(routeGroup, route.route);
+            console.log(
+                chalk.bold(
+                    chalk.bgBlue("[APP INFO]:"),
+                    chalk.blue("Registered route group:"),
+                    chalk.green(`${routeGroup}`)
+                )
+            );
+        }
     }
-
-    return application;
 };
 
 module.exports = {
