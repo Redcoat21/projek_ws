@@ -55,6 +55,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
+            balance: {
+                type: DataTypes.DECIMAL,
+                allowNull: false,
+            },
         },
         {
             sequelize,

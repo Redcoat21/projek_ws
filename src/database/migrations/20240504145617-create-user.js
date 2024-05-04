@@ -16,6 +16,11 @@ module.exports = {
                 type: Sequelize.STRING(255),
                 allowNull: false,
             },
+            balance: {
+                type: Sequelize.DECIMAL,
+                allowNull: false,
+                defaultValue: 0,
+            },
             password: {
                 type: Sequelize.STRING(80),
                 allowNull: false,
