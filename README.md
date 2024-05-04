@@ -30,6 +30,7 @@
 -   Di repo githubnya untuk branch `master` (jadi setiap pull request) bakalan dilakukan job sesuai workflow di Github Actionnya
     -   Intinya sih setiap pull request ke branch `master` bakal dilakuin sebuah unit test, yang dimana kalau testnya gagal gak bakal di merge
     -   Jadi bisa tolong diperhatiin kalau mau aman, setiap ngelakuin perubahan major bisa lakuin `npm run test`
+-   Disarankan untuk business logic (CRUD) ditaruh di folder `/src/services`, biar lebih gampang di test nantinya
 
 # Quality Of Life Tools
 

@@ -10,18 +10,18 @@ const routesParser = () => {
         const routeFiles = fs
             .readdirSync(routesPath)
             .filter((routeFile) => routeFile.endsWith(".js"));
+
+        const routes = [];
+        for (const routeFile of routeFiles) {
+            const routeGroup = routeFile.replace(".js", "");
+            const route = require(path.join(routesPath, routeFile));
+            routes.push({
+                group: routeGroup,
+                route: route,
+            });
+        }
     } catch (error) {
         return null;
-    }
-
-    const routes = [];
-    for (const routeFile of routeFiles) {
-        const routeGroup = routeFile.replace(".js", "");
-        const route = require(path.join(routesPath, routeFile));
-        routes.push({
-            group: routeGroup,
-            route: route,
-        });
     }
 
     return routes;
