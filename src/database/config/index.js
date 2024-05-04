@@ -1,9 +1,4 @@
-const fs = require('fs');
-
-const { dev, test } = require('../../config');
-
-console.log(dev);
-
+const { dev, test } = require("../../config");
 module.exports = {
     development: {
         username: dev.DB_USER,
@@ -13,8 +8,8 @@ module.exports = {
         port: dev.DB_PORT,
         dialect: dev.DB_DIALECT,
         dialectOptions: {
-            bigNumberStrings: false
-        }
+            bigNumberStrings: false,
+        },
     },
     test: {
         database: test.DB_NAME,
@@ -28,7 +23,7 @@ module.exports = {
         port: dev.DB_PORT,
         dialect: dev.DB_DIALECT,
         dialectOptions: {
-            bigNumberStrings: false
-        }
+            bigNumberStrings: false,
+        },
     },
-}
+};

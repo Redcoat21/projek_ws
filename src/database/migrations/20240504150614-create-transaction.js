@@ -30,10 +30,6 @@ module.exports = {
                 type: Sequelize.DECIMAL.UNSIGNED,
                 allowNull: false,
             },
-            total: {
-                type: Sequelize.DECIMAL.UNSIGNED,
-                allowNull: false,
-            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE,

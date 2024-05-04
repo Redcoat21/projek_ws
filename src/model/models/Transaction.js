@@ -38,10 +38,6 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DECIMAL.UNSIGNED,
                 allowNull: false,
             },
-            total: {
-                type: DataTypes.DECIMAL.UNSIGNED,
-                allowNull: false,
-            },
             arrivalDate: {
                 type: Sequelize.DATE,
                 allowNull: true,
