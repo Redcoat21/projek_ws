@@ -146,58 +146,68 @@ Normally harusnay ini gak diperlukan karena databasenya bakal di start saat `/sr
 
 # Router
 
-## How to create route
+## Routes automatically loaded
 
-Pastikan create routes cuma 1 level deep
-
-```
-./src/file1.js ✅
-./src/file2.js ✅
-./src/folder1/file1.js ❌
-```
+Routes nya udah di automatically loaded, jadi kita tinggal bikin file routernya aja.
 
 ## Creating Router
 
-Bikin file baru di folder router, INGAT cuma boleh 1 level!
+Bikin rotues bar harus di folder `src/routes` tidak boleh di folder lain, dan untuk setiap level foldernya maka akan jadi bagian dari nama routes juga.
 
-## Naming Router
-
-File routernya seharusnya dinamain sesuai...
+Contoh:
 
 ```javascript
-// Nama file test.js => localhost:3000/api/test
-// Nama file user.js => localhost:3000/api/user
-// Nama file product.js => localhost:3000/api/product
+// routes/api/group1/user.js
+// Route: localhost:3000/api/group1/user
+
+// routes/api/group1/group2/user.js
+// Route: localhost:3000/api/group1/group2/user
 ```
 
-Kalau mau misalnya bikin route `GET localhost:3000/api/user/create` maka perlu bikin
+Jadi kalau kita mau bikin sebuah routes `POST localhost:3000/api/user`, berarti buat file di `src/routes/api/user.js`
+
+Router yang dibuat di dalam file juga ada syntax spesialnya, kita hanya perlu melakukan `module.exports`
+
+Contoh kita mau membuat
+
+-   `GET localhost:3000/api/user`
+-   `POST localhost:3000/api/user`
+
+Maka di `src/routes/api/user.js` kita buat
 
 ```javascript
-//file routes/user.js
-
-// Karena router.get("/"), berarti mengarah ke localhost:3000/api/user/
-router.get("/create", (req, res) => {});
+module.exports = (expressApp) => ({
+    get: (req, res) => res.status(200).json({ message: "GET User" }),
+    post: (req, res) => res.status(201).json({ message: "POST User" }),
+});
 ```
 
-## Registering Router
+## Middleware
 
-Router yang ada di folder `routes` semua udah otomatis diregister ke app, jadi tidak usah di add manual
+Untuk middleware kita bisa menambahkannya di opsi `module.exports` nya
 
-Tidak usah di
+Contoh
 
 ```javascript
-const app = require("./src/app");
-const { userRouter } = require("./src/routes"); ❌
+module.exports = (expressApp) => ({
+    middleware: (req, res, next) => next(), // Tambahkan middlewarenya disini
+    get: (req, res) => res.status(200).json({ message: "GET User" }), // Middleware akan dijalankan kita mengakses route ini
+});
+```
 
-// TIDAK DISARANKAN UNTUK BEGINI
-app.use("/api/user", userRouter); ❌
+Middlewarenya juga bisa berupa array
+
+```javascript
+module.exports = (expressApp) => ({
+    middleware: [(req, res, next) => next(), (req, res, next) => next()],
+});
 ```
 
 # Model
 
 ## How to create model
 
-Dibikin dengan file di `src/models`, Pastikan nama filenya sesuai dengan nama modelnya! Dan pastikan nama filenya awalnya kapital!
+Dibikin dengan file di `src/model`, Pastikan nama filenya sesuai dengan nama modelnya! Dan pastikan nama filenya awalnya kapital!
 
 | File Name | Model Name | Status |
 | --------- | ---------- | ------ |
@@ -218,7 +228,7 @@ Model bisa diimport dengan cara
 
 ```javascript
 // WAJIB DI DESTRUCTURE, KALO GAK BAKAL ERROR
-const { User } = require("./src/models");
+const { User } = require("./src/model");
 ```
 
 # Config
