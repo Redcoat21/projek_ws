@@ -6,6 +6,7 @@ const { getUser, createUser } = require("../../service/user");
 const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = require("../../config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { createToken } = require("../../service/token");
 
 const registerUser = async (req, res) => {
     try {
@@ -59,17 +60,14 @@ const loginUser = async (req, res) => {
 
         const tempUser = { ...user.dataValues, password: undefined };
 
-        const accessToken = jwt.sign(tempUser, ACCESS_SECRET_KEY, {
-            expiresIn: "15m",
-        });
+        const accessToken = createToken(tempUser, "ACCESS", "15m");
 
         // Save accessToken to cookie for 15 minutes
         res.cookie("accessToken", accessToken);
 
+        // If rememberMe is checked (True) create a refresh token and store it into the database
         const refreshToken = rememberMe
-            ? jwt.sign(tempUser, REFRESH_SECRET_KEY, {
-                  expiresIn: "7d",
-              })
+            ? createToken(tempUser, "REFRESH", "7d")
             : null;
 
         user.refreshToken = refreshToken;
