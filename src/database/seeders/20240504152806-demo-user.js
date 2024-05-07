@@ -15,7 +15,7 @@ module.exports = {
             },
         });
         const users = [];
-        for (let i = 0; i < 997; i++) {
+        for (let i = 0; i < 97; i++) {
             const gender = Math.round(Math.random()) === 0 ? "male" : "female";
 
             const firstName = faker.person.firstName(gender);

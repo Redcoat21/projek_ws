@@ -21,6 +21,6 @@ module.exports = {
     NODE_ENV: process.env.NODE_ENV,
     APP_HOST: process.env.APP_HOST,
     APP_PORT: process.env.APP_PORT,
-    ACCESS_SECRET_KEY: process.env.ACCESS_TOKEN_KEY,
-    REFRESH_SECRET_KEY: process.env.REFRESH_TOKEN_KEY,
+    ACCESS_SECRET_KEY: process.env.ACCESS_SECRET_KEY,
+    REFRESH_SECRET_KEY: process.env.REFRESH_SECRET_KEY,
 };

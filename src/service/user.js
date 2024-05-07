@@ -6,7 +6,7 @@ const getUser = async (username) => {
 };
 
 const createUser = async (data) => {
-    const { username, name, email, password, phone, role } = data;
+    const { username, name, email, password, phone, role, refreshToken } = data;
     const user = await getUser(username);
 
     if (user) {
@@ -22,6 +22,7 @@ const createUser = async (data) => {
             phoneNumber: phone,
             name,
             role,
+            refreshToken,
         });
     } catch (error) {
         throw new Error(error.message);
