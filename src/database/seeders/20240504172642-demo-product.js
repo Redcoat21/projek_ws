@@ -13,7 +13,7 @@ module.exports = {
             },
         });
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 600; i++) {
             const name = faker.commerce.productName();
             const description = faker.commerce.productDescription();
             const price = faker.commerce.price({

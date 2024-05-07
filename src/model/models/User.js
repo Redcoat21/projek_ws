@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: "role",
             });
 
-            User.belongsTo(models.Subscription, {
+            User.hasMany(models.Subscription, {
                 foreignKey: "subscriber",
             });
 

@@ -9,11 +9,12 @@ const autoroutes = require("express-automatic-routes").default;
     await startDatabase(dev);
 
     // UNCOMMENT UNTUK START MONGO
-    await startDatabase(mongo);
+    // await startDatabase(mongo);
 
     await (async () => {
         autoroutes(app, {
             dir: "./routes",
+            log: true,
         });
 
         app.listen(APP_PORT, () => {
