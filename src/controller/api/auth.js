@@ -29,7 +29,14 @@ const registerUser = async (req, res) => {
 
         return res.status(201).json({
             message: "Registered succesfully",
-            data: newUser,
+            data: {
+                username: user.username,
+                name: user.name,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                profilePicture: user.profilePicture,
+                balance: user.balance,
+            },
         });
     } catch (error) {
         return res.status(400).json({ message: error.message });
@@ -38,8 +45,11 @@ const registerUser = async (req, res) => {
 
 //TODO Clean this up
 const loginUser = async (req, res) => {
-    if (jwt.verify(req.cookies.accessToken, ACCESS_SECRET_KEY)) {
-        return res.status(400).json({ message: "You are already logged in" });
+    res.clearCookie("accessToken");
+    try {
+        jwt.verify(req.cookies.accessToken, ACCESS_SECRET_KEY);
+    } catch (error) {
+        console.error(error);
     }
 
     try {
@@ -58,16 +68,18 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ message: "Invalid password" });
         }
 
-        const tempUser = { ...user.dataValues, password: undefined };
+        const tempUser = { username: user.username, role: user.role };
 
         const accessToken = createToken(tempUser, "ACCESS", "15m");
 
         // Save accessToken to cookie for 15 minutes
-        res.cookie("accessToken", accessToken);
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+        });
 
         // If rememberMe is checked (True) create a refresh token and store it into the database
         const refreshToken = rememberMe
-            ? createToken(tempUser, "REFRESH", "7d")
+            ? createToken(tempUser, "REFRESH", "999y")
             : null;
 
         user.refreshToken = refreshToken;
@@ -76,11 +88,18 @@ const loginUser = async (req, res) => {
         return res.status(200).json({
             message: "Logged in succesfully",
             data: {
-                user: user,
-                token: accessToken,
+                user: {
+                    username: user.username,
+                    name: user.name,
+                    email: user.email,
+                    phoneNumber: user.phoneNumber,
+                    profilePicture: user.profilePicture,
+                    balance: user.balance,
+                },
             },
         });
     } catch (error) {
+        console.error(error);
         return res.status(400).json({ message: error.message });
     }
 };
