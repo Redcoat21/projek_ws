@@ -10,7 +10,8 @@ const checkAccessToken = async (req, res, next) => {
     try {
         // Check whether the access token exist and not expired.
         const user = jwt.verify(accessToken, ACCESS_SECRET_KEY);
-        req.user = user;
+        const { iat, exp, ...filteredUser } = user;
+        req.user = filteredUser;
         next();
     } catch (error) {
         // If the access token exist, that must be means the token is expired.

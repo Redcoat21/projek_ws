@@ -1,18 +1,11 @@
-const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = require("../../config");
+const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY, test } = require("../../config");
 const { getAllRoles, getAllTiers } = require("../../service/admin");
 const jwt = require("jsonwebtoken");
 const { decodeToken } = require("../../service/token")
 
 const getAdminRole = async (req, res) => {
-    const user = await decodeToken(req.cookies.accessToken);
-    
-    if(!user){
-        return res.sendStatus(401);
-    }
-
-    if(user.role != "ADM"){
-        return res.sendStatus(403);
-    }
+    const user = req.user;
+    // console.log(user)
 
     const allRole = await getAllRoles();
 
@@ -20,16 +13,15 @@ const getAdminRole = async (req, res) => {
 }
 
 const getAdminTier = async (req, res) => {
-    const user = await decodeToken(req.cookies.accessToken);
-    if(!user){
-        return res.sendStatus(401);
-    }
+    const user = req.user;
 
-    if(user.role != "ADM"){
-        return res.sendStatus(403);
-    }
-
-    const allTier = await getAllTiers();
+    let allTier = await getAllTiers();
+    allTier = allTier.map((item) => {
+        return {
+            name: item.name,
+            price: item.price,
+        }
+    })
 
     return res.status(200).send(allTier)
 }
