@@ -1,4 +1,4 @@
-const { getOneTrans, getOneTransUser, getTotal, getOneTransSeller, getProfit, getAllTransUser, getAllTransSeller, getAllProfit } = require("../../service/transaction")
+const { getOneTrans, getOneTransUser, getTotal, getOneTransSeller, getProfit, getAllTransUser, getAllTransSeller, getAllProfit, getAllTotal } = require("../../service/transaction")
 
 const getOneTransaction = async (req, res) => {
     const user = req.user
@@ -84,7 +84,18 @@ const getMyTransaction = async (req, res) => {
     let trans = null
 
     if(user.role == "USR"){
-        trans = await getAllTransUser(user)
+        let list_trans = await getAllTransUser(user)
+        let total = getAllTotal(list_trans)
+
+        for (const t of list_trans) {
+            t.deliveryPrice = "Rp. " + parseInt(t.deliveryPrice).toLocaleString("ID-id")
+            t.total = "Rp. " + parseInt(t.total).toLocaleString("ID-id")
+        }
+
+        trans = {
+            list: list_trans,
+            total: total
+        }
     }
     else{
         let dtrans = await getAllTransSeller(user)

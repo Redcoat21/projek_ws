@@ -130,13 +130,6 @@ const getAllTransUser = async (user) => {
         let dtrans = await getOneTransUser(t.id)
         let total = getTotal(dtrans, t.deliveryPrice)
 
-        t.deliveryPrice = "Rp. " + parseInt(t.deliveryPrice).toLocaleString("ID-id")
-        for (const d of dtrans) {
-            d.product.price = "Rp. " + parseInt(d.product.price).toLocaleString("ID-id")
-            d.subtotal = "Rp. " + parseInt(d.subtotal).toLocaleString("ID-id")
-        }
-        total = "Rp. " + parseInt(total).toLocaleString("ID-id")
-
         // t.detail = dtrans
         t.total = total
 
@@ -210,6 +203,25 @@ const getAllProfit = (dtrans) => {
     return total
 }
 
+const getAllTotal = (trans) => {
+    let harga = trans.map((item) => {
+        return {
+            kirim: item.deliveryPrice,
+            total: item.total
+        }
+    })
+
+    let total = 0
+    for (const hrg of harga) {
+        total += parseInt(hrg.kirim)
+        total += parseInt(hrg.total)
+    }
+
+    total = "Rp. " + total.toLocaleString("ID-id")
+
+    return total
+}
+
 module.exports = {
     getOneTrans,
     getOneTransUser,
@@ -218,5 +230,6 @@ module.exports = {
     getProfit,
     getAllTransUser,
     getAllTransSeller,
-    getAllProfit
+    getAllProfit,
+    getAllTotal
 }
