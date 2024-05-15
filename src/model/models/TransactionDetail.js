@@ -2,7 +2,15 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     class TransactionDetail extends Model {
-        static associate(models) {}
+        static associate(models) {
+            TransactionDetail.belongsTo(models.Product, {
+                foreignKey: 'product',
+            });
+
+            TransactionDetail.belongsTo(models.Transaction, {
+                foreignKey: 'transaction',
+            });
+        }
     }
     TransactionDetail.init(
         {
@@ -32,6 +40,8 @@ module.exports = (sequelize, DataTypes) => {
         {
             sequelize,
             modelName: "TransactionDetail",
+            tableName: "transaction_details",
+            timestamps: false,
         }
     );
     return TransactionDetail;

@@ -2,6 +2,7 @@ const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = require("../config");
 const { createToken } = require("../service/token");
 const jwt = require("jsonwebtoken");
 const { getUser } = require("../service/user");
+const { truncate } = require("../database/client/mysql");
 
 //TODO Clean this up and find better way to handle this.
 const checkAccessToken = async (req, res, next) => {
@@ -49,7 +50,24 @@ const checkRole = (role) => {
     };
 };
 
+const checkMoreRole = (roles) => {
+    return (req, res, next) => {
+        listRoles = roles.split(",");
+        allowed = false
+        for (const role of listRoles) {
+            if(role == req.user.role){
+                allowed = true
+            }
+        }
+        if(!allowed){
+            return res.status(403).json({ message: "Forbidden" });
+        }
+        next();
+    }
+}
+
 module.exports = {
     checkAccessToken,
     checkRole,
+    checkMoreRole,
 };
