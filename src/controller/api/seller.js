@@ -27,19 +27,16 @@ const sellerProducts = async (req, res) => {
     let findUser = await getUser(username);
 
     if (findUser) {
-      let findthissellerproduct = await findSellerproduct(username);
-      return res.status(200).json(findthissellerproduct);
-      //   if (!bcrypt.compareSync(password, findUser.password)) {
-      //     return res.status(400).json({ Message: "Wrong Password Check again" });
-      //   } else {
-      //     if (findUser.role.toLowerCase() == "slr") {
-
-      //     } else {
-      //       return res
-      //         .status(400)
-      //         .json({ Message: "Only Seller can Check their own product" });
-      //     }
-      //   }
+      if (!bcrypt.compareSync(password, findUser.password)) {
+        return res.status(400).json({ Message: "Wrong Password Check again" });
+      } else {
+        if (findUser.role.toLowerCase() == "slr") {
+        } else {
+          return res
+            .status(400)
+            .json({ Message: "Only Seller can Check their own product" });
+        }
+      }
     } else {
       return res.status(400).json({ Message: "User not found" });
     }
