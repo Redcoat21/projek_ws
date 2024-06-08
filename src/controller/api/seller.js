@@ -1,97 +1,68 @@
 const {
   validateLoginSchema,
   validateRegisterSchema,
-} = require("../../validation/api/auth");
+} = require("../../validation/api/auth")
 const {
-  findSellerproduct,
+  getSellerProduct,
   removeproduct,
   checkvalid,
-} = require("../../service/product");
-const { getUser } = require("../../service/user");
-const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = require("../../config");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { createToken } = require("../../service/token");
+} = require("../../service/product")
+const { getUser } = require("../../service/user")
+const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = require("../../config")
+const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
+const { createToken } = require("../../service/token")
+const faker = require("faker")
 
 const sellerProducts = async (req, res) => {
-  res.clearCookie("accessToken");
-  try {
-    jwt.verify(req.cookies.accessToken, ACCESS_SECRET_KEY);
-  } catch (error) {
-    console.error(error);
-  }
+  let { username, password, id } = req.body
 
-  try {
-    const { username, password } = validateLoginSchema.validate(req.body).value;
+  if (username && password) {
+    let findUser = await getUser(username)
 
-    let findUser = await getUser(username);
-
-    if (findUser) {
-      if (!bcrypt.compareSync(password, findUser.password)) {
-        return res.status(400).json({ Message: "Wrong Password Check again" });
-      } else {
-        if (findUser.role.toLowerCase() == "slr") {
-        } else {
-          return res
-            .status(400)
-            .json({ Message: "Only Seller can Check their own product" });
-        }
-      }
-    } else {
-      return res.status(400).json({ Message: "User not found" });
+    if (!findUser) {
+      return res.status(400).json({ Message: "User not found!" })
     }
-  } catch (error) {
-    return res.status(400).json({ message: error.toString() });
-  }
-};
 
-const deletetsellerproduct = async (req, res) => {
-  res.clearCookie("accessToken");
-  try {
-    jwt.verify(req.cookies.accessToken, ACCESS_SECRET_KEY);
-  } catch (error) {
-    console.error(error);
-  }
+    if (!bcrypt.compareSync(password, findUser.password)) {
+      return res.status(400).json({ Message: "Wrong Password Check again!" })
+    }
 
-  try {
-    const { username, password } = validateLoginSchema.validate(req.body).value;
-    let findUser = await getUser(username);
+    if (!id) {
+      return res.status(400).json({ Error: "ID needed!" })
+    }
 
-    if (findUser) {
-      let id = req.body.id;
-      let valid = "test";
-
-      if (valid) {
-        let removesellerproduct = await removeproduct(id);
-        return res.status(200).json({
-          Message: `${username} success remove their ${valid.name} product`,
-        });
+    if (parseInt(id)) {
+      if (findUser.role == "slr") {
+        let output = await getSellerProduct(username)
+        return res.status(200).json({ "Products List": output })
       } else {
         return res
           .status(403)
-          .json({ Message: "This product is not this seller's product" });
+          .json({ "Foridden Access": "Only Seller can Access" })
       }
-
-      //   if (!bcrypt.compareSync(password, findUser.password)) {
-      //     return res.status(400).json({ Message: "Wrong Password Check again" });
-      //   } else {
-      //     if (findUser.role.toLowerCase() == "slr") {
-
-      //     } else {
-      //       return res
-      //         .status(400)
-      //         .json({ Message: "Only Seller can Check their own product" });
-      //     }
-      //   }
     } else {
-      return res.status(400).json({ Message: "User not found" });
+      return res.status(403).json({ Error: "Id Invalid!" })
     }
-  } catch (error) {
-    return res.status(400).json({ message: error.toString() });
+  } else {
+    return res.status(400).json({ Error: "Username or Password if empty!" })
   }
-};
+}
+
+const AddsellerProduct = async (req, res) => {
+  let {} = req.body
+
+  const id = faker.commerce.isbn({
+    separator: "-",
+  })
+
+  return res.status(200).json(id)
+}
+
+const deletetsellerproduct = async (req, res) => {}
 
 module.exports = {
   sellerProducts,
   deletetsellerproduct,
-};
+  AddsellerProduct,
+}
