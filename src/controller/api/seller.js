@@ -62,10 +62,13 @@ const deletetsellerproduct = async (req, res) => {
       let valid = "test";
 
       if (valid) {
-        let removesellerproduct = await removeproduct(id);
-        return res.status(200).json({
-          Message: `${username} success remove their ${valid.name} product`,
-        });
+        let tempcheck = await findSellerproduct(id);
+        if (tempcheck) {
+          let removesellerproduct = await removeproduct(tempcheck.id);
+          return res.status(200).json({
+            Message: `${username} success remove their ${valid.name} product`,
+          });
+        }
       } else {
         return res
           .status(403)
