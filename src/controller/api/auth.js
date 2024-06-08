@@ -30,12 +30,12 @@ const registerUser = async (req, res) => {
         return res.status(201).json({
             message: "Registered succesfully",
             data: {
-                username: user.username,
-                name: user.name,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                profilePicture: user.profilePicture,
-                balance: user.balance,
+                username: newUser.username,
+                name: newUser.name,
+                email: newUser.email,
+                phoneNumber: newUser.phoneNumber,
+                profilePicture: newUser.profilePicture,
+                balance: newUser.balance,
             },
         });
     } catch (error) {
