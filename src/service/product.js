@@ -1,32 +1,49 @@
-const { where } = require("sequelize");
-const { Product } = require("../model");
+const { where } = require("sequelize")
+const { Product } = require("../model")
 
 const findProduct = async (id) => {
-  return await Product.findByPk(id);
-};
+  const product = await Product.findByPk(id)
 
-const findallproduct = async () => {
-  return await Product.findAll();
-};
+  return {
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    seller: product.seller,
+  }
+}
 
-const findSellerproduct = async (username) => {
+const findAllProducts = async () => {
+  const products = await Product.findAll()
+  return products.map((product) => {
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      seller: product.seller,
+    }
+  })
+}
+
+const getSellerProduct = async (username) => {
   let findthisproduct = await Product.findAll({
     where: {
       seller: username,
     },
-  });
-  return findthisproduct;
-};
+  })
+  return findthisproduct
+}
 
 const removeproduct = async (id) => {
   let remove = await Product.findOne({
     where: {
       id: id,
     },
-  });
+  })
 
-  return remove;
-};
+  return remove
+}
 
 const checkvalid = async (id, username) => {
   let valid = await Product.findOne({
@@ -34,15 +51,15 @@ const checkvalid = async (id, username) => {
       id: id,
       seller: username,
     },
-  });
+  })
 
-  return valid;
-};
+  return valid
+}
 
 module.exports = {
   findProduct,
-  findallproduct,
-  findSellerproduct,
+  findAllProducts,
+  getSellerProduct,
   removeproduct,
   checkvalid,
-};
+}
