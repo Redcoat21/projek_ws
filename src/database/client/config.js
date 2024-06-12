@@ -1,114 +1,43 @@
 const { Sequelize } = require("sequelize");
-const { MongoClient } = require("mongodb");
-const { NODE_ENV, dev, test } = require("../../config");
+const { NODE_ENV, dev, test, prod } = require("../../config");
 const chalk = require("chalk");
 
-const sequelize = {
-    start: async (db) => {
-        const development = NODE_ENV === "development";
-        try {
-            await db.authenticate();
-            console.log(
-                chalk.bold(
-                    chalk.bgBlue("[DB INFO]:"),
-                    chalk.green(
-                        `Database connection has been estabilished succesfully using ${
-                            development ? dev.DB_DIALECT : test.DB_DIALECT
-                        } at ${
-                            development
-                                ? dev.DB_HOST +
-                                  ":" +
-                                  dev.DB_PORT +
-                                  "/" +
-                                  dev.DB_NAME
-                                : dev.DB_DIALECT + ":memory"
-                        }`
-                    )
-                )
-            );
-        } catch (error) {
-            if (error.original.code === "ECONNREFUSED") {
-                console.log(
-                    chalk.bold(
-                        chalk.bgRed("[DB ERROR]:"),
-                        chalk.red(
-                            `Database connection ${
-                                development ? dev.DB_DIALECT : test.DB_DIALECT
-                            } failed to connect!`
-                        )
-                    )
-                );
-            }
-        }
-    },
-    stop: async (db) => {
-        await db.close();
-        console.log(
-            chalk.bold(
-                chalk.bgBlue("[DB INFO]:"),
-                chalk.green(
-                    `${
-                        NODE_ENV === "development"
-                            ? dev.DB_DIALECT
-                            : test.DB_DIALECT
-                    } Database connection has been closed`
-                )
-            )
-        );
-    },
-};
-
-const mongo = {
-    start: async (client) => {
-        try {
-            await client.connect();
-            chalk.bold(
-                chalk.bgBlue("[DB INFO]:"),
-                chalk.green(
-                    `MongoDB connection has been estabilished succesfully`
-                )
-            );
-        } catch (error) {
-            console.error(error);
-            console.log(
-                chalk.bold(
-                    chalk.bgRed("[DB ERROR]:"),
-                    chalk.red("MongoDB connection failed")
-                )
-            );
-        }
-    },
-    stop: async (client) => {
-        await client.close();
-        console.log(
-            chalk.bold(
-                chalk.bgBlue("[DB INFO]:"),
-                chalk.green("MongoDB connection has been closed")
-            )
-        );
-    },
-};
-
+const instance = NODE_ENV.toLowerCase() === "development" ? dev : NODE_ENV.toLowerCase() === "production" ? prod : test;
 const startDatabase = async (db) => {
-    if (db instanceof Sequelize) {
-        await sequelize.start(db);
-    } else if (db instanceof MongoClient) {
-        await mongo.start(db);
-    } else {
+    try {
+        await db.authenticate();
+        console.log(
+            chalk.bold(
+                chalk.bgBlue("[DB INFO]:"),
+                chalk.green(`Database connection has been estabilished succesfully at ${instance.DB_HOST}:${instance.DB_PORT}/${instance.DB_NAME} as ${instance.DB_USER}!`)
+            )
+        );
+    } catch(error) {
         console.log(
             chalk.bold(
                 chalk.bgRed("[DB ERROR]:"),
-                chalk.green("Invalid Database Type!")
+                chalk.red(
+                    `Database connection failed when attempting to connect to ${instance.DB_HOST}:${instance.DB_PORT}/${instance.DB_NAME} as ${instance.DB_USER}`
+                )
             )
         );
+        console.error(error);
     }
 };
 
 const stopDatabase = async (db) => {
-    if (db instanceof Sequelize) {
-        await sequelize.stop(db);
-    } else if (db instanceof MongoClient) {
-        await mongo.stop(db);
-    }
+    await db.close();
+    console.log(
+        chalk.bold(
+            chalk.bgBlue("[DB INFO]:"),
+            chalk.green(
+                `${
+                    NODE_ENV === "development"
+                        ? dev.DB_DIALECT
+                        : test.DB_DIALECT
+                } Database connection has been closed`
+            )
+        )
+    );
 };
 module.exports = { startDatabase, stopDatabase };

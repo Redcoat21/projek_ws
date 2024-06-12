@@ -1,12 +1,12 @@
-const { DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_DIALECT, DB_PORT } =
-    require("../../config").dev;
+const { dev, prod, NODE_ENV } = require("../../config")
 const { Sequelize } = require("sequelize");
 const chalk = require("chalk");
 
-module.exports = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-    host: DB_HOST,
-    port: DB_PORT,
-    dialect: DB_DIALECT,
+const db = NODE_ENV.toLowerCase() === "development" ? dev : NODE_ENV.toLowerCase() === "production" ? prod : test;
+module.exports = new Sequelize(db.DB_NAME, db.DB_USER, db.DB_PASSWORD, {
+    host: db.DB_HOST,
+    port: db.DB_PORT,
+    dialect: db.DB_DIALECT,
     logging: (...msg) => {
         return console.log(
             chalk.bold(chalk.bgBlue("[DB QUERY]:")),
