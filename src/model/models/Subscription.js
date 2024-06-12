@@ -4,8 +4,12 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     class Subscription extends Model {
         static associate(models) {
-            Subscription.hasMany(models.User, {
+            Subscription.belongsTo(models.User, {
                 foreignKey: "subscriber",
+            });
+
+            Subscription.belongsTo(models.SubscriptionTier, {
+                foreignKey: "tier",
             });
         }
     }

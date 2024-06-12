@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: "role",
             });
 
-            User.belongsTo(models.Subscription, {
+            User.hasMany(models.Subscription, {
                 foreignKey: "subscriber",
             });
 
@@ -35,15 +35,15 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING(80),
                 allowNull: false,
             },
-            phone_number: {
+            phoneNumber: {
                 type: DataTypes.STRING(30),
                 allowNull: false,
             },
-            api_key: {
+            apiKey: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
-            profile_picture: {
+            profilePicture: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
@@ -51,13 +51,14 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.CHAR(3),
                 allowNull: false,
             },
-            refresh_token: {
+            refreshToken: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
             balance: {
                 type: DataTypes.DECIMAL,
                 allowNull: false,
+                defaultValue: 0,
             },
         },
         {
