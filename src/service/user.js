@@ -29,7 +29,59 @@ const createUser = async (data) => {
     }
 };
 
+const topupSaldo = async (user, saldo) => {
+    await User.update(
+        {balance: parseInt(user.balance) + saldo},
+        {
+            where: {
+                username: user.username
+            }
+        }
+    )
+
+    return await getUser(user.username)
+}
+
+const updateDataService = async (user, name, email, phoneNumber) => {
+    if(name){
+        await User.update(
+            {name: name},
+            {
+                where:{
+                    username: user.username
+                }
+            }
+        )
+    }
+
+    if(email){
+        await User.update(
+            {email: email},
+            {
+                where: {
+                    username: user.username
+                }
+            }
+        )
+    }
+
+    if(phoneNumber){
+        await User.update(
+            {phoneNumber: phoneNumber},
+            {
+                where: {
+                    username: user.username
+                }
+            }
+        )
+    }
+
+    return await getUser(user.username)
+}
+
 module.exports = {
     getUser,
     createUser,
+    topupSaldo,
+    updateDataService,
 };
