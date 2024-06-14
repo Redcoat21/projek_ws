@@ -3,6 +3,17 @@ const { fakerID_ID: faker } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 const { Role } = require("../../model");
 const { Op } = require("sequelize");
+const addressGenerator = () => {
+    const country = "Indonesia";
+    const city = faker.location.city();
+    const state = faker.location.state();
+    const address = faker.location.streetAddress();
+    const zipCode = faker.location.zipCode();
+
+    const buildingNumber = faker.location.buildingNumber();
+
+    return `${address} No ${buildingNumber}, ${zipCode}, ${city}, ${state}, ${country}`;
+};
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
@@ -28,6 +39,7 @@ module.exports = {
             const role =
                 roles[Math.floor(Math.random() * roles.length)].dataValues.id;
             const balance = faker.finance.amount();
+            const origin = addressGenerator();
             users.push({
                 name: name,
                 email: email,
@@ -36,35 +48,43 @@ module.exports = {
                 password: bcrypt.hashSync(password, 10),
                 role: role,
                 balance: balance,
+                address: origin
             });
-
-            // users.push(
-            //     {
-            //         name: "test admin",
-            //         email: "admin@gmail.com",
-            //         username: "admin",
-            //         phone_number: faker.phone.number(),
-            //         password: bcrypt.hashSync("admin123", 10),
-            //         role: "ADM",
-            //     },
-            //     {
-            //         name: "test seller",
-            //         email: "seller@gmail.com",
-            //         username: "seller",
-            //         phone_number: faker.phone.number(),
-            //         password: bcrypt.hashSync("seller123", 10),
-            //         role: "SLR",
-            //     },
-            //     {
-            //         name: "test user",
-            //         email: "user@gmail.com",
-            //         username: "user",
-            //         phone_number: faker.phone.number(),
-            //         password: bcrypt.hashSync("user123", 10),
-            //         role: "USR",
-            //     }
-            // );
         }
+
+        users.push({
+            name: 'test user',
+            email: 'testuser@test.com',
+            username: 'testuser',
+            password: bcrypt.hashSync('testuser123', 10),
+            role: 'USR',
+            balance: 200000,
+            address: 'Jl. Ngagel Jaya Tengah No.73-77, 60284, Surabaya, Jawa Timur, Indonesia',
+            phone_number: '(+62) 877 4091 2578'
+        });
+
+        users.push({
+            name: 'test seller',
+            email: 'testseller@test.com',
+            username: 'testseller',
+            password: bcrypt.hashSync('testseller123', 10),
+            role: 'SLR',
+            balance: 100000,
+            address: 'Jl Mangga Besar 11/8, 11170, DKI Jakarta, Jakarta, Indonesia',
+            phone_number: '(+62) 811 17000 7136'
+        });
+
+        users.push({
+            name: 'test admin',
+            email: 'testadmin@test.com',
+            username: 'testadmin',
+            password: bcrypt.hashSync('testadmin123', 10),
+            role: 'ADM',
+            balance: 0,
+            address: 'Jl Kaligarang 2 B Lt 1, 50231, Semarang, Jawa Tengah, Indonesia',
+            phone_number: '(+62) 812 2506 7171'
+        });
+
         return queryInterface.bulkInsert("users", users);
     },
 

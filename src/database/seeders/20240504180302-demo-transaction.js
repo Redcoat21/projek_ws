@@ -27,25 +27,14 @@ module.exports = {
         });
         for (let i = 0; i < 20; i++) {
             const id = faker.string.uuid();
-            const origin = addressGenerator();
             const destination = addressGenerator();
-            const deliveryPrice = faker.commerce.price({
-                min: 20000,
-                max: 200000,
-            });
             const buyer =
                 buyers[Math.floor(Math.random() * buyers.length)].dataValues
                     .username;
-            const arrival = faker.date.future({
-                refDate: DateTime.now(),
-            });
             transactions.push({
                 id: id,
-                origin: origin,
                 destination: destination,
-                delivery_price: deliveryPrice,
                 buyer: buyer,
-                arrival_date: arrival,
             });
         }
         return queryInterface.bulkInsert("transactions", transactions);

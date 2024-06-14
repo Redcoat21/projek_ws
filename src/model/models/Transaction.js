@@ -26,21 +26,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING(255),
                 allowNull: false,
             },
-            origin: {
-                type: DataTypes.STRING(255),
-                allowNull: false,
-            },
             destination: {
                 type: DataTypes.STRING(255),
                 allowNull: false,
-            },
-            deliveryPrice: {
-                type: DataTypes.DECIMAL.UNSIGNED,
-                allowNull: false,
-            },
-            arrivalDate: {
-                type: Sequelize.DATE,
-                allowNull: true,
             },
         },
         {

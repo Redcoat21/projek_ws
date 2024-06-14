@@ -18,26 +18,14 @@ module.exports = {
                     key: "username",
                 },
             },
-            origin: {
-                type: Sequelize.STRING(255),
-                allowNull: false,
-            },
             destination: {
                 type: Sequelize.STRING(255),
-                allowNull: false,
-            },
-            delivery_price: {
-                type: Sequelize.DECIMAL.UNSIGNED,
                 allowNull: false,
             },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.fn("NOW"),
-            },
-            arrival_date: {
-                type: Sequelize.DATE,
-                allowNull: true,
             },
         });
     },

@@ -1,5 +1,5 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Sequelize} = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     class TransactionDetail extends Model {
         static associate(models) {}
@@ -25,6 +25,14 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             subtotal: {
+                type: DataTypes.DECIMAL.UNSIGNED,
+                allowNull: false,
+            },
+            arrivalDate: {
+                type: Sequelize.DATE,
+                allowNull: true,
+            },
+            deliveryPrice: {
                 type: DataTypes.DECIMAL.UNSIGNED,
                 allowNull: false,
             },

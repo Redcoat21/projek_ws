@@ -20,9 +20,7 @@ module.exports = {
                 min: 10000,
                 max: 30000000,
             });
-            const id = faker.commerce.isbn({
-                separator: "-",
-            });
+            const id = faker.string.uuid();
             const seller =
                 sellers[Math.floor(Math.random() * sellers.length)].dataValues
                     .username;
