@@ -16,6 +16,11 @@ const validateRegisterSchema = Joi.object({
         .required(),
     role: Joi.string().min(3).max(3).valid("USR", "SLR"),
     name: Joi.string(),
+    address: Joi.string().pattern(
+        /^.+,\s*[^,]+,\s*[^,]+,\s*[^,]+$/
+    ).required().messages({
+        'string.pattern.base': '"{{#label}}" must be in the format: <street_name>, <city>, <provinces>, <country>'
+    })
 });
 
 module.exports = {
