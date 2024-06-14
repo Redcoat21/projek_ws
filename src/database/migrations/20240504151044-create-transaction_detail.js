@@ -19,7 +19,7 @@ module.exports = {
                 },
             },
             product: {
-                type: Sequelize.STRING(20),
+                type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: "products",
