@@ -2,3 +2,4 @@
 .env
 bun.*
 .idea/
+/scratch/

@@ -45,9 +45,10 @@ const registerUser = async (req, res) => {
 
 //TODO Clean this up
 const loginUser = async (req, res) => {
-    res.clearCookie("accessToken");
+
     try {
         jwt.verify(req.cookies.accessToken, ACCESS_SECRET_KEY);
+        return res.status(200).json({ message: "Already logged in!" });
     } catch (error) {
         console.error(error);
     }
