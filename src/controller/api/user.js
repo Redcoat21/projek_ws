@@ -2,7 +2,7 @@ const { LocalStorage } = require("node-localstorage");
 const { validateCartSchema, validateCheckoutSchema} = require("../../validation/api/user");
 const { getProduct } = require("../../service/product");
 const { addTransaction, getLastTransaction, addTransactionDetail } = require("../../service/transaction");
-const { getUser } = require("../../service/user");
+const { getUser, getSubscription} = require("../../service/user");
 const { RAJAONGKIR_BASE_URL, RAJAONGKIR_API_KEY} = require("../../config");
 const localStorage = new LocalStorage("./scratch");
 const axios = require("axios");
@@ -127,6 +127,26 @@ const checkout = async (req, res) => {
     const { courier_choice: courierChoice, service_choice: serviceChoice } = value;
 
     const buyer = await getUser(req.user.username);
+    const subscription = await getSubscription(buyer.username);
+    let discountRate;
+
+    // If the user is subscribed, they will gain discount.
+    if(!subscription) {
+        discountRate = 0;
+    } else {
+        switch(subscription.tier) {
+            case 1:
+                discountRate = 0.1;
+                break;
+            case 2:
+                discountRate = 0.25;
+                break;
+            case 3:
+                discountRate = 0.5;
+                break;
+        }
+    }
+
     const cart = JSON.parse(localStorage.getItem(`${buyer.username} cart`));
 
     if(!cart || cart.length === 0) {
@@ -143,7 +163,7 @@ const checkout = async (req, res) => {
             const seller = await getUser(groupedItem[0].product.seller);
             const deliveryData = (await calculateDeliveryPrice(buyer.address, 'Jl Mangga Besar 11/8, 11170, Jakarta Barat, DKI Jakarta, Indonesia', courierChoice)).data.rajaongkir;
             const chosenService = deliveryData.results[0].costs.find(cost => cost.service === serviceChoice);
-            const deliveryPrice = chosenService.cost[0].value;
+            const deliveryPrice = chosenService.cost[0].value - (chosenService.cost[0].value * discountRate);
 
             const lastTransaction = await addTransaction({
                 buyer: buyer.username,

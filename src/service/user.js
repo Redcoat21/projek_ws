@@ -1,4 +1,4 @@
-const { User } = require("../model");
+const { User, Subscription } = require("../model");
 const bcrypt = require("bcrypt");
 
 const getUser = async (username) => {
@@ -31,7 +31,16 @@ const createUser = async (data, transaction = undefined) => {
     }
 };
 
+const getSubscription = async (subscriber) => {
+    return (await Subscription.findOne({
+        where: {
+            subscriber: subscriber
+        }
+    }));
+}
+
 module.exports = {
     getUser,
     createUser,
+    getSubscription
 };
