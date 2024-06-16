@@ -9,39 +9,46 @@ const jwt = require("jsonwebtoken");
 const { createToken } = require("../../service/token");
 
 const registerUser = async (req, res) => {
-    try {
-        const {
-            username,
-            password,
-            email,
-            phone_number: phone,
-            role,
-            name,
-        } = validateRegisterSchema.validate(req.body).value;
+    const { value, error } = validateRegisterSchema.validate(req.body);
 
-        const newUser = await createUser({
-            username,
-            password,
-            email,
-            phone,
-            role,
-            name,
-        });
-
-        return res.status(201).json({
-            message: "Registered succesfully",
-            data: {
-                username: newUser.username,
-                name: newUser.name,
-                email: newUser.email,
-                phoneNumber: newUser.phoneNumber,
-                profilePicture: newUser.profilePicture,
-                balance: newUser.balance,
-            },
-        });
-    } catch (error) {
+    if(error) {
+        console.error(error);
         return res.status(400).json({ message: error.message });
     }
+
+
+    const {
+        username,
+        password,
+        email,
+        phone_number: phone,
+        role,
+        name,
+        address
+    } = value;
+
+    const newUser = await createUser({
+        username,
+        password,
+        email,
+        phone,
+        role,
+        name,
+        address
+    });
+
+    return res.status(201).json({
+        message: "Registered succesfully",
+        data: {
+            username: newUser.username,
+            name: newUser.name,
+            email: newUser.email,
+            phoneNumber: newUser.phoneNumber,
+            profilePicture: newUser.profilePicture,
+            balance: newUser.balance,
+            address: address
+        },
+    });
 };
 
 //TODO Clean this up

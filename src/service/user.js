@@ -6,7 +6,7 @@ const getUser = async (username) => {
 };
 
 const createUser = async (data, transaction = undefined) => {
-    const { username, name, email, password, phone, role, refreshToken } = data;
+    const { username, name, email, password, phone, role, refreshToken, address } = data;
     const user = await getUser(username);
 
     if (user) {
@@ -20,9 +20,9 @@ const createUser = async (data, transaction = undefined) => {
             email,
             password: bcrypt.hashSync(password, 10),
             phoneNumber: phone,
-            name,
             role,
             refreshToken,
+            address
         }, {
             transaction: transaction
         });
