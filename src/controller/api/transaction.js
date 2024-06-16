@@ -32,15 +32,15 @@ const getOneTransaction = async (req, res) => {
         trans.detail = dtrans
         trans.total = total
 
-        trans.arrivalDate = trans.arrivalDate.toLocaleString('en-GB', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-        });
+        // trans.arrivalDate = trans.arrivalDate.toLocaleString('en-GB', {
+        //     year: 'numeric',
+        //     month: '2-digit',
+        //     day: '2-digit',
+        //     hour: '2-digit',
+        //     minute: '2-digit',
+        //     second: '2-digit',
+        //     hour12: false,
+        // });
 
         return res.status(200).send(trans)
     }
@@ -65,15 +65,15 @@ const getOneTransaction = async (req, res) => {
         trans.detail = dtrans
         trans.profit = profit
 
-        trans.arrivalDate = trans.arrivalDate.toLocaleString('en-GB', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-        });
+        // trans.arrivalDate = trans.arrivalDate.toLocaleString('en-GB', {
+        //     year: 'numeric',
+        //     month: '2-digit',
+        //     day: '2-digit',
+        //     hour: '2-digit',
+        //     minute: '2-digit',
+        //     second: '2-digit',
+        //     hour12: false,
+        // });
 
         return res.status(200).send(trans)
     }
