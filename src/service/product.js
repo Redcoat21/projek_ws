@@ -6,7 +6,7 @@ const getProduct = async (id) => {
 }
 
 const addProduct = async (productData, transaction = undefined) => {
-    const { name, description, seller, price } = productData;
+    const { name, description, seller, price, weight } = productData;
     const id = randomUUID();
 
     await Product.create({
@@ -15,10 +15,10 @@ const addProduct = async (productData, transaction = undefined) => {
         description: description,
         seller: seller,
         price: price,
+        weight: weight
     }, {
         transaction: transaction
     });
-
 }
 
 module.exports = {
