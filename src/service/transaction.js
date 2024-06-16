@@ -145,10 +145,8 @@ const getAllTransUser = async (user) => {
     trans = trans.map((item) => {
         return {
             id: item.id,
-            origin: item.origin,
             destination: item.destination,
             deliveryPrice: item.deliveryPrice,
-            arrivalDate: item.arrivalDate
         }
     })
 
@@ -158,16 +156,6 @@ const getAllTransUser = async (user) => {
 
         // t.detail = dtrans
         t.total = total
-
-        t.arrivalDate = t.arrivalDate.toLocaleString('en-GB', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-        });
     }
 
     return trans
@@ -185,7 +173,7 @@ const getAllTransSeller = async (user) => {
         }
     });
     dtrans = dtrans.map((item) => item.dataValues)
-    console.log(dtrans)
+    // console.log(dtrans)
 
     list_trans = dtrans.map((item) => item.transaction)
 
