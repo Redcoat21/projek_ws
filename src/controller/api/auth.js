@@ -113,7 +113,19 @@ const loginUser = async (req, res) => {
     }
 };
 
+const logoutUser = async (req, res) => {
+    try {
+        jwt.verify(req.cookies.accessToken, ACCESS_SECRET_KEY);
+        res.clearCookie("accessToken");
+        return res.status(200).json({ message: "Logged out succesfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(400).json({ message: "Not logged in yet" });
+    }
+}
+
 module.exports = {
     loginUser,
     registerUser,
+    logoutUser
 };
