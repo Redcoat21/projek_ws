@@ -18,6 +18,7 @@ const registerUser = async (req, res) => {
             role,
             name,
         } = validateRegisterSchema.validate(req.body).value;
+
         const newUser = await createUser({
             username,
             password,

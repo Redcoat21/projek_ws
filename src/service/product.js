@@ -5,7 +5,7 @@ const getProduct = async (id) => {
     return await Product.findByPk(id);
 }
 
-const addProduct = async (productData) => {
+const addProduct = async (productData, transaction = undefined) => {
     const { name, description, seller, price } = productData;
     const id = randomUUID();
 
@@ -15,6 +15,8 @@ const addProduct = async (productData) => {
         description: description,
         seller: seller,
         price: price,
+    }, {
+        transaction: transaction
     });
 
 }

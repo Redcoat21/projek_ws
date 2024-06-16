@@ -28,18 +28,17 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DECIMAL.UNSIGNED,
                 allowNull: false,
             },
-            arrivalDate: {
+            deliveryDate: {
                 type: Sequelize.DATE,
                 allowNull: true,
-            },
-            deliveryPrice: {
-                type: DataTypes.DECIMAL.UNSIGNED,
-                allowNull: false,
             },
         },
         {
             sequelize,
             modelName: "TransactionDetail",
+            tableName: "transaction_details",
+            underscored: true,
+            timestamps: false
         }
     );
     return TransactionDetail;

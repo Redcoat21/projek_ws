@@ -1,6 +1,6 @@
 const { Transaction, TransactionDetail } = require("../model");
 const { randomUUID } = require("crypto");
-const addTransaction = async (transactionData) => {
+const addTransaction = async (transactionData, transaction = undefined) => {
     const { destination, buyer, deliveryPrice } = transactionData;
 
     const id = randomUUID();
@@ -10,6 +10,8 @@ const addTransaction = async (transactionData) => {
         buyer: buyer,
         deliveryPrice: deliveryPrice,
         destination: destination
+    }, {
+        transaction: transaction
     }));
 }
 
@@ -23,7 +25,7 @@ const getLastTransaction = async () => {
     });
 }
 
-const addTransactionDetail = async (transactionDetailData) => {
+const addTransactionDetail = async (transactionDetailData, transactionT = undefined) => {
     const id = randomUUID();
     const { transaction, product, quantity, subtotal, deliveryDate } = transactionDetailData;
 
@@ -34,6 +36,8 @@ const addTransactionDetail = async (transactionDetailData) => {
         quantity,
         subtotal,
         deliveryDate,
+    }, {
+        transaction: transactionT
     })
 }
 

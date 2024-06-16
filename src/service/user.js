@@ -5,7 +5,7 @@ const getUser = async (username) => {
     return await User.findByPk(username);
 };
 
-const createUser = async (data) => {
+const createUser = async (data, transaction = undefined) => {
     const { username, name, email, password, phone, role, refreshToken } = data;
     const user = await getUser(username);
 
@@ -23,6 +23,8 @@ const createUser = async (data) => {
             name,
             role,
             refreshToken,
+        }, {
+            transaction: transaction
         });
     } catch (error) {
         throw new Error(error.message);
