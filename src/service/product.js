@@ -15,7 +15,6 @@ const addProduct = async (productData) => {
         description: description,
         seller: seller,
         price: price,
-        createdAt: luxon.DateTime.now()
     });
 
 }
