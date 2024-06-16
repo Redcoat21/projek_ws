@@ -2,7 +2,15 @@
 const { Model, Sequelize} = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     class TransactionDetail extends Model {
-        static associate(models) {}
+        static associate(models) {
+            TransactionDetail.belongsTo(models.Product, {
+                foreignKey: 'product',
+            });
+
+            TransactionDetail.belongsTo(models.Transaction, {
+                foreignKey: 'transaction',
+            });
+        }
     }
     TransactionDetail.init(
         {
