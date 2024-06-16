@@ -20,18 +20,13 @@ module.exports = {
                 const arrival = faker.date.future({
                     refDate: DateTime.now(),
                 });
-                const deliveryPrice = faker.commerce.price({
-                    min: 20000,
-                    max: 200000,
-                });
                 transactionDetails.push({
                     id: id,
                     transaction: transaction.dataValues.id,
                     product: product.id,
                     quantity: quantity,
                     subtotal: quantity * product.price,
-                    arrival_date: arrival,
-                    delivery_price: deliveryPrice,
+                    delivery_date: arrival,
                 });
             }
         }

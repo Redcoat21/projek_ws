@@ -3,18 +3,7 @@ const { fakerID_ID: faker } = require("@faker-js/faker");
 /** @type {import('sequelize-cli').Migration} */
 const { User } = require("../../model");
 const { DateTime } = require("luxon");
-
-const addressGenerator = () => {
-    const country = "Indonesia";
-    const city = faker.location.city();
-    const state = faker.location.state();
-    const address = faker.location.streetAddress();
-    const zipCode = faker.location.zipCode();
-
-    const buildingNumber = faker.location.buildingNumber();
-
-    return `${address} No ${buildingNumber}, ${zipCode}, ${city}, ${state}, ${country}`;
-};
+const { addressGenerator } = require("../../utility/address");
 
 module.exports = {
     async up(queryInterface, Sequelize) {
@@ -31,10 +20,15 @@ module.exports = {
             const buyer =
                 buyers[Math.floor(Math.random() * buyers.length)].dataValues
                     .username;
+            const deliveryPrice = faker.commerce.price({
+                min: 20000,
+                max: 50000
+            });
             transactions.push({
                 id: id,
                 destination: destination,
                 buyer: buyer,
+                delivery_price: deliveryPrice
             });
         }
         return queryInterface.bulkInsert("transactions", transactions);

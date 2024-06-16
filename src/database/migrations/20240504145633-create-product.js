@@ -28,6 +28,11 @@ module.exports = {
                 type: Sequelize.DECIMAL,
                 allowNull: false,
             },
+            weight: {
+                // Weight in gram.
+                type: Sequelize.INTEGER.UNSIGNED,
+                allowNull: false,
+            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE,

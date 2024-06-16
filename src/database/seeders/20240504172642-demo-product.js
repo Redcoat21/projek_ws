@@ -24,12 +24,14 @@ module.exports = {
             const seller =
                 sellers[Math.floor(Math.random() * sellers.length)].dataValues
                     .username;
+            const weight = Math.floor(Math.random() * 20);
             products.push({
                 id: id,
                 name: name,
                 description: description,
                 price: price,
                 seller: seller,
+                weight: weight
             });
         }
         return queryInterface.bulkInsert("products", products);

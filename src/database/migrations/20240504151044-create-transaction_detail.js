@@ -34,13 +34,9 @@ module.exports = {
                 type: Sequelize.DECIMAL.UNSIGNED,
                 allowNull: false,
             },
-            arrival_date: {
+            delivery_date: {
                 type: Sequelize.DATE,
                 allowNull: true,
-            },
-            delivery_price: {
-                type: Sequelize.DECIMAL.UNSIGNED,
-                allowNull: false,
             },
         });
     },

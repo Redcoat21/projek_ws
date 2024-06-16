@@ -3,17 +3,7 @@ const { fakerID_ID: faker } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 const { Role } = require("../../model");
 const { Op } = require("sequelize");
-const addressGenerator = () => {
-    const country = "Indonesia";
-    const city = faker.location.city();
-    const state = faker.location.state();
-    const address = faker.location.streetAddress();
-    const zipCode = faker.location.zipCode();
-
-    const buildingNumber = faker.location.buildingNumber();
-
-    return `${address} No ${buildingNumber}, ${zipCode}, ${city}, ${state}, ${country}`;
-};
+const { addressGenerator } = require("../../utility/address");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
@@ -70,7 +60,7 @@ module.exports = {
             password: bcrypt.hashSync('testseller123', 10),
             role: 'SLR',
             balance: 100000,
-            address: 'Jl Mangga Besar 11/8, 11170, DKI Jakarta, Jakarta, Indonesia',
+            address: 'Jl Mangga Besar 11/8, 11170, Jakarta Barat, DKI Jakarta, Indonesia',
             phone_number: '(+62) 811 17000 7136'
         });
 
