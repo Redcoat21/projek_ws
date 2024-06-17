@@ -6,7 +6,6 @@ const { APP_PORT, APP_HOST, NODE_ENV } = require("./config");
 const { dev, mongo, startDatabase } = require("./database");
 const autoroutes = require("express-automatic-routes").default;
 (async () => {
-    console.log('hello world');
     await startDatabase(dev);
 
     // UNCOMMENT UNTUK START MONGO
@@ -32,7 +31,7 @@ const autoroutes = require("express-automatic-routes").default;
                 chalk.bold(
                     chalk.bgBlue("[APP INFO]:"),
                     chalk.blue("Server is running on port: ") +
-                        chalk.green(`http://${APP_HOST}:${APP_PORT}`)
+                        chalk.green(`${APP_PORT}`)
                 )
             );
         });
