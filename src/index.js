@@ -6,8 +6,6 @@ const { APP_PORT, APP_HOST, NODE_ENV } = require("./config");
 const { dev, mongo, startDatabase } = require("./database");
 const autoroutes = require("express-automatic-routes").default;
 (async () => {
-    console.log('hello world');
-    console.log('testing testing');
     await startDatabase(dev);
 
     // UNCOMMENT UNTUK START MONGO
