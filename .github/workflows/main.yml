@@ -1,48 +1,45 @@
-name: Projek WS Continuous Integarion
+name: Projek WS Continuous Integration
 
 on:
-    pull_request:
-        branches:
-            - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
-    build:
-        name: Build and Test
-        environment: development
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - name: Set up NodeJS v.18
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "18"
-            - name: Setup MySQL environment
-              uses: mirromutth/mysql-action@v1.1
-              with:
-                  mysql user: ${{ secrets.DB_USER }}
-                  mysql password: ${{ secrets.DB_PASSWORD }}
-                  mysql database: ${{ vars.DB_NAME }}
+  build:
+    name: Build and Test
+    environment: development
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up NodeJS v.18
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      - name: Setup MySQL environment
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql user: ${{ secrets.DB_USER }}
+          mysql password: ${{ secrets.DB_PASSWORD }}
+          mysql database: ${{ vars.DB_NAME }}
+      - name: Setup SQLite environment
+        uses: ccorsi/setup-sqlite@v1.0.1
+        with:
+          sqlite-version: 3.40.0
+          sqlite-year: 2022
+      - name: Setup MongoDB environment
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-version: "7.0"
+      - name: Install dependencies
+        run: npm install && npm ci
+      - name: Run tests
+        run: npm test
+        env:
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          DB_NAME: ${{ vars.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-            - name: Setup SQLite environment
-              uses: ccorsi/setup-sqlite@v1.0.1
-              with:
-                  sqlite-version: 3.40.0
-                  sqlite-year: 2022
-
-            - name: Setup MongoDB environment
-              uses: supercharge/mongodb-github-action@1.10.0
-              with:
-                  mongodb-version: "7.0"
-
-            - name: Install dependencies
-              run: npm install && npm ci
-
-            - name: Run tests
-              run: npm test
-              env:
-                  DB_HOST: ${{ vars.DB_HOST }}
-                  DB_PORT: ${{ vars.DB_PORT }}
-                  DB_NAME: ${{ vars.DB_NAME }}
-                  DB_USER: ${{ secrets.DB_USER }}
-                  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-                  DATABASE_URL: ${{ secrets.DATABASE_URL }}

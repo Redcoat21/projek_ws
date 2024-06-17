@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npx jest",
-    "build": "node src/index",
-    "dev": "npx nodemon src/index",
+    "build": "",
+    "dev": "NODE_ENV=development npx nodemon src/index",
+    "start": "NODE_ENV=production node src/index",
     "undo:migrate": "npx sequelize-cli db:migrate:undo:all",
     "undo:seed": "npx sequelize-cli db:seed:undo:all",
     "migrate": "npx sequelize-cli db:migrate",
