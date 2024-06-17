@@ -9,54 +9,45 @@ const jwt = require("jsonwebtoken");
 const { createToken } = require("../../service/token");
 
 const registerUser = async (req, res) => {
-    const { value, error } = validateRegisterSchema.validate(req.body);
+    try {
+        const {
+            username,
+            password,
+            email,
+            phone_number: phone,
+            role,
+            name,
+        } = validateRegisterSchema.validate(req.body).value;
+        const newUser = await createUser({
+            username,
+            password,
+            email,
+            phone,
+            role,
+            name,
+        });
 
-    if(error) {
-        console.error(error);
+        return res.status(201).json({
+            message: "Registered succesfully",
+            data: {
+                username: newUser.username,
+                name: newUser.name,
+                email: newUser.email,
+                phoneNumber: newUser.phoneNumber,
+                profilePicture: newUser.profilePicture,
+                balance: newUser.balance,
+            },
+        });
+    } catch (error) {
         return res.status(400).json({ message: error.message });
     }
-
-
-    const {
-        username,
-        password,
-        email,
-        phone_number: phone,
-        role,
-        name,
-        address
-    } = value;
-
-    const newUser = await createUser({
-        username,
-        password,
-        email,
-        phone,
-        role,
-        name,
-        address
-    });
-
-    return res.status(201).json({
-        message: "Registered succesfully",
-        data: {
-            username: newUser.username,
-            name: newUser.name,
-            email: newUser.email,
-            phoneNumber: newUser.phoneNumber,
-            profilePicture: newUser.profilePicture,
-            balance: newUser.balance,
-            address: address
-        },
-    });
 };
 
 //TODO Clean this up
 const loginUser = async (req, res) => {
-
+    res.clearCookie("accessToken");
     try {
         jwt.verify(req.cookies.accessToken, ACCESS_SECRET_KEY);
-        return res.status(200).json({ message: "Already logged in!" });
     } catch (error) {
         console.error(error);
     }
@@ -113,19 +104,7 @@ const loginUser = async (req, res) => {
     }
 };
 
-const logoutUser = async (req, res) => {
-    try {
-        jwt.verify(req.cookies.accessToken, ACCESS_SECRET_KEY);
-        res.clearCookie("accessToken");
-        return res.status(200).json({ message: "Logged out succesfully" });
-    } catch (error) {
-        console.error(error);
-        return res.status(400).json({ message: "Not logged in yet" });
-    }
-}
-
 module.exports = {
     loginUser,
     registerUser,
-    logoutUser
 };
