@@ -2,6 +2,7 @@ const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = require("../config");
 const { createToken } = require("../service/token");
 const jwt = require("jsonwebtoken");
 const { getUser } = require("../service/user");
+const { truncate } = require("../database/client/mysql");
 
 //TODO Clean this up and find better way to handle this.
 const checkAccessToken = async (req, res, next) => {
@@ -10,7 +11,8 @@ const checkAccessToken = async (req, res, next) => {
     try {
         // Check whether the access token exist and not expired.
         const user = jwt.verify(accessToken, ACCESS_SECRET_KEY);
-        req.user = user;
+        const { iat, exp, ...filteredUser } = user;
+        req.user = filteredUser;
         next();
     } catch (error) {
         // If the access token exist, that must be means the token is expired.
@@ -48,7 +50,24 @@ const checkRole = (role) => {
     };
 };
 
+const checkMoreRole = (roles) => {
+    return (req, res, next) => {
+        listRoles = roles.split(",");
+        allowed = false
+        for (const role of listRoles) {
+            if(role == req.user.role){
+                allowed = true
+            }
+        }
+        if(!allowed){
+            return res.status(403).json({ message: "Forbidden" });
+        }
+        next();
+    }
+}
+
 module.exports = {
     checkAccessToken,
     checkRole,
+    checkMoreRole,
 };

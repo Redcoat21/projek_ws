@@ -1,8 +1,16 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Sequelize} = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     class TransactionDetail extends Model {
-        static associate(models) {}
+        static associate(models) {
+            TransactionDetail.belongsTo(models.Product, {
+                foreignKey: 'product',
+            });
+
+            TransactionDetail.belongsTo(models.Transaction, {
+                foreignKey: 'transaction',
+            });
+        }
     }
     TransactionDetail.init(
         {
@@ -28,10 +36,17 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DECIMAL.UNSIGNED,
                 allowNull: false,
             },
+            deliveryDate: {
+                type: Sequelize.DATE,
+                allowNull: true,
+            },
         },
         {
             sequelize,
             modelName: "TransactionDetail",
+            tableName: "transaction_details",
+            underscored: true,
+            timestamps: false
         }
     );
     return TransactionDetail;

@@ -1,0 +1,21 @@
+name: Projek WS Deploy to Glitch
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Glitch
+        uses: kanadgupta/glitch-sync@main
+        with:
+          auth-token: '${{ secrets.GLITCH_ACCESS_TOKEN }}'
+          project-id: '${{ secrets.GLITCH_PROJECT_ID }}'

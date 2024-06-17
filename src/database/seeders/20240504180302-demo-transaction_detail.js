@@ -17,12 +17,16 @@ module.exports = {
                     products[Math.floor(Math.random() * products.length)]
                         .dataValues;
                 const quantity = Math.floor(Math.random() * 10) + 1;
+                const arrival = faker.date.future({
+                    refDate: DateTime.now(),
+                });
                 transactionDetails.push({
                     id: id,
                     transaction: transaction.dataValues.id,
                     product: product.id,
                     quantity: quantity,
                     subtotal: quantity * product.price,
+                    delivery_date: arrival,
                 });
             }
         }

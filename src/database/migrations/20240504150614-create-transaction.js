@@ -18,10 +18,6 @@ module.exports = {
                     key: "username",
                 },
             },
-            origin: {
-                type: Sequelize.STRING(255),
-                allowNull: false,
-            },
             destination: {
                 type: Sequelize.STRING(255),
                 allowNull: false,
@@ -34,10 +30,6 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.fn("NOW"),
-            },
-            arrival_date: {
-                type: Sequelize.DATE,
-                allowNull: true,
             },
         });
     },

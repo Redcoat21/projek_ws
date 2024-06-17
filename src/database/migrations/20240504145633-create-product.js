@@ -6,7 +6,7 @@ module.exports = {
             id: {
                 allowNull: false,
                 primaryKey: true,
-                type: Sequelize.STRING(20),
+                type: Sequelize.UUID,
             },
             name: {
                 type: Sequelize.STRING(255),
@@ -26,6 +26,11 @@ module.exports = {
             },
             price: {
                 type: Sequelize.DECIMAL,
+                allowNull: false,
+            },
+            weight: {
+                // Weight in gram.
+                type: Sequelize.INTEGER.UNSIGNED,
                 allowNull: false,
             },
             created_at: {

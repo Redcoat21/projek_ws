@@ -25,4 +25,6 @@ module.exports = {
     APP_PORT: process.env.APP_PORT,
     ACCESS_SECRET_KEY: process.env.ACCESS_SECRET_KEY,
     REFRESH_SECRET_KEY: process.env.REFRESH_SECRET_KEY,
+    RAJAONGKIR_BASE_URL: 'https://api.rajaongkir.com/starter',
+    RAJAONGKIR_API_KEY: process.env.RAJAONGKIR_API_KEY
 };
