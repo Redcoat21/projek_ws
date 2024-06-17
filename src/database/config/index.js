@@ -24,6 +24,7 @@ module.exports = {
         dialect: prod.DB_DIALECT,
         dialectOptions: {
             bigNumberStrings: false,
+            connectTimeout: 120000,
         },
     },
 };
