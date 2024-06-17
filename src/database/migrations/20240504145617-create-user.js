@@ -37,10 +37,6 @@ module.exports = {
                 type: Sequelize.STRING(255),
                 allowNull: true,
             },
-            address: {
-                type: Sequelize.STRING(255),
-                allowNull: false
-            },
             role: {
                 type: Sequelize.CHAR(3),
                 allowNull: false,

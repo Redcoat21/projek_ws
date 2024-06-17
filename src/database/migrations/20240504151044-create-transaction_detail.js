@@ -19,7 +19,7 @@ module.exports = {
                 },
             },
             product: {
-                type: Sequelize.UUID,
+                type: Sequelize.STRING(20),
                 allowNull: false,
                 references: {
                     model: "products",
@@ -33,10 +33,6 @@ module.exports = {
             subtotal: {
                 type: Sequelize.DECIMAL.UNSIGNED,
                 allowNull: false,
-            },
-            delivery_date: {
-                type: Sequelize.DATE,
-                allowNull: true,
             },
         });
     },
