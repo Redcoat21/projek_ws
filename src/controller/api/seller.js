@@ -48,12 +48,12 @@ const sellerProducts = async (req, res) => {
 }
 
 const AddsellerProduct = async (req, res) => {
-  let { name, description, price, weight } = req.body
+  let { name, description, price, weight, seller } = req.body
 
   let findUser = await getUser(req.user.username)
 
   if (name && description && price) {
-    let check = await checkdouble(username, name)
+    let check = await checkdouble(req.user.username, name)
 
     if (check) {
       return res
@@ -65,7 +65,7 @@ const AddsellerProduct = async (req, res) => {
       name,
       description,
       price,
-      req.user.username,
+      req.user.role === "SLR" ? req.user.username : seller,
         weight
     )
 

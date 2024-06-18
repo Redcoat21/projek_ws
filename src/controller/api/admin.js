@@ -3,12 +3,13 @@ const {
     validateRegisterSchema,
 } = require("../../validation/api/auth");
 const { getUser } = require("../../service/user");
-const { findProduct, findAllProducts } = require("../../service/product");
+const { findProduct, findAllProducts, getSellerProduct } = require("../../service/product");
 const { ACCESS_SECRET_KEY, REFRESH_SECRET_KEY } = require("../../config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { createToken } = require("../../service/token");
 const Joi = require("joi");
+const { Product } = require("../../model");
 
 const getAllProduct = async (req, res) => {
     if(req.user.role !== "ADM") {
@@ -21,14 +22,21 @@ const getAllProduct = async (req, res) => {
 };
 
 const getProducts = async (req, res) => {
-    if(req.user.role !== "ADM") {
-        return res.status(403).json({ message: "Forbidden" });
-    }
     const id = req.params.id;
+    if(req.user.role !== "ADM") {
+        const result = await Product.findByPk(id);
+        if(result.seller !== req.user.username) {
+            return res.status(403).json({ message: "Item doesnt belong to this seller"});
+        }
+        return res.status(200).json({ "Products List": result})
+    }
+    console.log(id);
 
     if (!id) {
         return res.status(400).json({ Error: "ID needed!" });
     }
+
+    const output = await findProduct(id);
 
     return res.status(200).json({ "Products List": output });
 };
