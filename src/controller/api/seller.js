@@ -95,8 +95,8 @@ const deletetsellerproduct = async (req, res) => {
 }
 
 const updateSellerProduct = async (req, res) => {
-  let { id, name, price, description } = req.body
-  let find = await getSellerProduct(username)
+  let { name, price, description, seller } = req.body
+  const id = req.params.id;
   let tempname, tempdesc, tempprice
 
   if (name) {
@@ -117,18 +117,16 @@ const updateSellerProduct = async (req, res) => {
     tempdesc = find.description
   }
 
-    let findUser = await getUser(username)
-
     if (!id) {
       return res.status(400).json({ Error: "Id Needed" })
     }
 
     // If admin bypass check.
-      let valid = req.user.role === "ADM" ? true : await checkvalid(id, username)
+      let valid = req.user.role === "ADM" ? true : await checkvalid(id, seller)
       if (valid) {
         let destroy = await updateProduct(
           id,
-          username,
+          seller,
           tempname,
           tempdesc,
           tempprice
@@ -137,7 +135,7 @@ const updateSellerProduct = async (req, res) => {
       } else {
         return res
           .status(403)
-          .json({ Forbidden: `This is not ${username} product` })
+          .json({ Forbidden: `This is not ${seller} product` })
       }
 }
 
