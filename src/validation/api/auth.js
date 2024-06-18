@@ -15,8 +15,14 @@ const validateRegisterSchema = Joi.object({
     phone_number: Joi.string()
         .regex(/^(?:\+\d{1,3})?(?:\d{3,5}(?:[\s-]?\d{3,5}){2}|\d{9,11})$/)
         .label("Phone Number")
-        .required(),
-    role: Joi.string().min(3).max(3).label("Role").required().valid("USR", "SLR"),
+        .required().messages({
+            "string.pattern": "Invalid phone number format"
+        }),
+    role: Joi.string().min(3).max(3).label("Role").required().valid("USR", "SLR").valid({
+        "any.only": "Valid roles are USR and SLR",
+        "string.min": "Length must be 3",
+        "string.max": "Length must be 3"
+    }),
     name: Joi.string().label("Name").required(),
     address: Joi.string().pattern(
         /^.+?,\s*\d{5},\s*.+?,\s*.+?,\s*.+?$/
