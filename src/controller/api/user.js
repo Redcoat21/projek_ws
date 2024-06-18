@@ -157,6 +157,7 @@ const checkout = async (req, res) => {
 
     const t = await sequelize.transaction();
 
+    let totalPrice = 0;
     try {
         for (const groupedItem of groupedCart) {
             // Because the cart is grouped based on the seller, we only need to query the seller once, and not for each group item.
@@ -186,8 +187,16 @@ const checkout = async (req, res) => {
                     subtotal: productData.price * product.amount,
                     deliveryDate: luxon.DateTime.now().plus(Number(estimatedTime))
                 }, t)
+
+                totalPrice += productData.price * product.amount;
             }
         }
+
+        if(buyer.balance < totalPrice) {
+            await t.rollback();
+            return res.status(402).json({ message: "Insufficient Balance" });
+        }
+
         await t.commit();
         localStorage.removeItem(`${buyer.username} cart`);
         return res.status(200).json({ message: "Checked out succesfully" });
