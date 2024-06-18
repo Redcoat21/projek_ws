@@ -1,6 +1,6 @@
 const { checkout } = require("../../../controller/api/user");
-const { checkAccessToken } = require("../../../middleware/token");
+const { checkAccessToken, checkRole } = require("../../../middleware/token");
 module.exports = (expressApp) => ({
-    middleware: checkAccessToken,
+    middleware: [checkAccessToken, checkRole("USR")],
     post: checkout
 })

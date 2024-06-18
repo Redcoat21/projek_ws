@@ -29,7 +29,16 @@ const validateCheckoutSchema = Joi.object({
     })
 });
 
+const createUserSchema = Joi.object({
+    username: Joi.string().required(),
+    name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+    phone_number: Joi.string().required(),
+});
+
 module.exports = {
     validateCartSchema,
-    validateCheckoutSchema
+    validateCheckoutSchema,
+    createUserSchema
 }
