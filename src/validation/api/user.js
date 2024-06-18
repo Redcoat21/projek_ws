@@ -37,8 +37,15 @@ const createUserSchema = Joi.object({
     phone_number: Joi.string().required(),
 });
 
+const subscribeSchema = Joi.object({
+    tier: Joi.string().valid("Premium", "Silver", "Gold").required().messages({
+        "any.only": "Valid tiers are Premium, Silver, Gold"
+    })
+})
+
 module.exports = {
     validateCartSchema,
     validateCheckoutSchema,
-    createUserSchema
+    createUserSchema,
+    subscribeSchema
 }

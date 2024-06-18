@@ -1,5 +1,5 @@
 const { LocalStorage } = require("node-localstorage");
-const { validateCartSchema, validateCheckoutSchema, createUserSchema } = require("../../validation/api/user");
+const { validateCartSchema, validateCheckoutSchema, createUserSchema, subscribeSchema } = require("../../validation/api/user");
 const { getProduct } = require("../../service/product");
 const { addTransaction, getLastTransaction, addTransactionDetail } = require("../../service/transaction");
 const { getUser, getSubscription} = require("../../service/user");
@@ -11,6 +11,7 @@ const qs = require("qs");
 const luxon = require("luxon");
 const { dev: sequelize } = require("../../database");
 const { User } = require("../../model");
+const { getSubscriptionTiers, addSubscription } = require("../../service/subscription");
 
 const getCart = async (req, res) => {
     let cart = JSON.parse(localStorage.getItem(`${req.user.username} cart`));
@@ -337,6 +338,41 @@ const deleteOneUser = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+const subscribe = async (req, res) => {
+    const tiers = await getSubscriptionTiers();
+    const subscriber = await getUser(req.user.username);
+
+    const { value, error } = subscribeSchema.validate(req.body);
+
+    if(error) {
+        return res.status(400).json({ message: error.message });
+    }
+
+    const { tier } = value;
+
+    const subscriptionTier = tiers.find(st => st.name === tier);
+
+    if(!subscriptionTier) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if(subscriber.balance < subscriptionTier.price) {
+        return res.status(402).json({message: "Insufficient balance"});
+
+    }
+
+    await addSubscription({
+        tier: subscriptionTier.id,
+        subscriber: req.user.username
+    })
+
+    subscriber.balance -= subscriptionTier.price;
+    subscriber.update();
+
+    return res.status(200).json({ message: "Subscribed succesfully", expiredAt: luxon.DateTime.now().plus({months: 1})});
+};
+
 module.exports = {
     getCart,
     addToCart,
@@ -344,5 +380,6 @@ module.exports = {
     getManyUser,
     getOneUser,
     createOneUser,
-    deleteOneUser
+    deleteOneUser,
+    subscribe
 }
