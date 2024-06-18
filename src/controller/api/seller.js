@@ -76,7 +76,8 @@ const AddsellerProduct = async (req, res) => {
 }
 
 const deletetsellerproduct = async (req, res) => {
-  let { id } = req.body
+  let { id } = req.params
+const { seller } = req.body;
 
     if (!id) {
       return res.status(400).json({ Error: "Id Needed" })
