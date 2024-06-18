@@ -13,7 +13,7 @@ const validateUpdateData = Joi.object({
     name: Joi.string().allow('').messages({
         "any.string": "Format nama salah!"
     }),
-});
+}).unknown(true);
 
 module.exports = {
     validateUpdateData,

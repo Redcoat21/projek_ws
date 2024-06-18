@@ -25,16 +25,26 @@ const updateData = async (req, res) => {
 
     if (error) {
         return res.status(400).json({
-            error: error.details[0].message,
+            error: error.details[0].message
         });
     }
 
     const { email, phone_number: phone, name } = value;
 
-    console.log(email, phone, name);
+    // console.log(email, phone, name);
     const newUser = await updateDataService(user, name, email, phone)
 
+    let msg = ""
+
+    if(req.file){
+        msg = "Profile picture sudah diupdate"
+    }
+    else{
+        msg = "Tidak ada update dalam profile picture"
+    }
+
     return res.status(200).send({
+        profilePicture: msg,
         username: newUser.username,
         name: newUser.name,
         email: newUser.email,
