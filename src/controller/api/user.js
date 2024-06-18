@@ -1,5 +1,5 @@
 const { LocalStorage } = require("node-localstorage");
-const { validateCartSchema, validateCheckoutSchema} = require("../../validation/api/user");
+const { validateCartSchema, validateCheckoutSchema, createUserSchema } = require("../../validation/api/user");
 const { getProduct } = require("../../service/product");
 const { addTransaction, getLastTransaction, addTransactionDetail } = require("../../service/transaction");
 const { getUser, getSubscription} = require("../../service/user");
@@ -10,6 +10,7 @@ const axios = require("axios");
 const qs = require("qs");
 const luxon = require("luxon");
 const { dev: sequelize } = require("../../database");
+const { User } = require("../../model");
 
 const getCart = async (req, res) => {
     let cart = JSON.parse(localStorage.getItem(`${req.user.username} cart`));
@@ -228,8 +229,123 @@ const checkout = async (req, res) => {
     }
 }
 
+const getManyUser = async (req, res) => {
+    try {
+        const users = await User.findAll({
+            attributes: ["username", "name", "email"], // Hanya pilih kolom tertentu
+            where: {
+                role: "USR",
+            },
+        });
+
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("Unable to connect to the database:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+const getOneUser = async (req, res) => {
+    if(req.user.role !== "ADM") {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+    try {
+
+        const user = await User.findOne({
+            attributes: ["username", "name", "email"], // Hanya pilih kolom tertentu
+            where: {
+                username: req.params.id,
+            },
+        });
+
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).send("User not found");
+        }
+    } catch (error) {
+        console.error("Unable to connect to the database:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+const createOneUser = async (req, res) => {
+    try {
+        const { error, value } = createUserSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
+        }
+
+        const { username, name, email, password, phone_number } = value;
+
+        const newUser = await User.create({
+            username,
+            name,
+            email,
+            password, // Password disimpan tanpa hashing
+            phone_number,
+            role: "USR", // Asumsikan 'USR' adalah id untuk role 'user'
+            balance: 0,
+        });
+
+        res.status(201).json({
+            message: "User created successfully",
+            user: {
+                username: newUser.username,
+                name: newUser.name,
+                email: newUser.email,
+                balance: newUser.balance,
+                created_at: newUser.created_at,
+            },
+        });
+    } catch (error) {
+        if (error.name === "SequelizeUniqueConstraintError") {
+            return res
+                .status(409)
+                .json({ error: "Username or email already exists" });
+        }
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+const deleteOneUser = async (req, res) => {
+    if(req.user.role !== "ADM") {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const username = req.params.id; // menggunakan username sebagai id
+
+    try {
+        // Cari user
+        const user = await User.findByPk(username);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Hapus semua produk yang terkait dengan pengguna
+        await Product.destroy({
+            where: { seller: username },
+            force: true, // Ini akan menghapus secara permanen, bukan soft delete
+        });
+
+        // Hapus pengguna
+        await user.destroy();
+
+        res.status(200).json({
+            message: "User and related products deleted successfully",
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
 module.exports = {
     getCart,
     addToCart,
-    checkout
+    checkout,
+    getManyUser,
+    getOneUser,
+    createOneUser,
+    deleteOneUser
 }
