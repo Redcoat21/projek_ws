@@ -34,7 +34,11 @@ const createUserSchema = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
-    phone_number: Joi.string().required(),
+    phone: Joi.string().required(),
+    address: Joi.string().pattern(
+        /^.+?,\s*\d{5},\s*.+?,\s*.+?,\s*.+?$/
+    ),
+    role: Joi.string()
 });
 
 const subscribeSchema = Joi.object({

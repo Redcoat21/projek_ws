@@ -10,8 +10,9 @@ const axios = require("axios");
 const qs = require("qs");
 const luxon = require("luxon");
 const { dev: sequelize } = require("../../database");
-const { User } = require("../../model");
+const { User, Product,  } = require("../../model");
 const { getSubscriptionTiers, addSubscription } = require("../../service/subscription");
+const { createUser } = require("../../service/user");
 
 const getCart = async (req, res) => {
     let cart = JSON.parse(localStorage.getItem(`${req.user.username} cart`));
@@ -274,17 +275,19 @@ const createOneUser = async (req, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
-        const { username, name, email, password, phone_number } = value;
+        const { username, name, email, password, phone, role, address } = value;
 
-        const newUser = await User.create({
-            username,
-            name,
-            email,
-            password, // Password disimpan tanpa hashing
-            phone_number,
-            role: "USR", // Asumsikan 'USR' adalah id untuk role 'user'
-            balance: 0,
-        });
+        const newUser = await createUser({ username, name, email, password, phone, role, address });
+
+        // const newUser = await User.create({
+        //     username,
+        //     name,
+        //     email,
+        //     , // Password disimpan tanpa hashing
+        //     phone_number,
+        //     role: "USR", // Asumsikan 'USR' adalah id untuk role 'user'
+        //     balance: 0,
+        // });
 
         res.status(201).json({
             message: "User created successfully",
@@ -297,6 +300,7 @@ const createOneUser = async (req, res) => {
             },
         });
     } catch (error) {
+        console.error(error);
         if (error.name === "SequelizeUniqueConstraintError") {
             return res
                 .status(409)
@@ -322,10 +326,10 @@ const deleteOneUser = async (req, res) => {
         }
 
         // Hapus semua produk yang terkait dengan pengguna
-        await Product.destroy({
-            where: { seller: username },
-            force: true, // Ini akan menghapus secara permanen, bukan soft delete
-        });
+        // await Product.destroy({
+        //     where: { seller: username },
+        //     force: true, // Ini akan menghapus secara permanen, bukan soft delete
+        // });
 
         // Hapus pengguna
         await user.destroy();
