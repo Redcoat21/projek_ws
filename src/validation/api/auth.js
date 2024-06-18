@@ -28,6 +28,6 @@ const validateRegisterSchema = Joi.object({
 });
 
 module.exports = {
-    validateLoginSchema,
-    validateRegisterSchema,
+  validateLoginSchema,
+  validateRegisterSchema,
 };

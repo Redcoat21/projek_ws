@@ -232,10 +232,7 @@ const checkout = async (req, res) => {
 const getManyUser = async (req, res) => {
     try {
         const users = await User.findAll({
-            attributes: ["username", "name", "email"], // Hanya pilih kolom tertentu
-            where: {
-                role: "USR",
-            },
+            attributes: ["username", "name", "email", "role"], // Hanya pilih kolom tertentu
         });
 
         res.status(200).json(users);

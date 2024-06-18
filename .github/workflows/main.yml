@@ -27,10 +27,6 @@ jobs:
         with:
           sqlite-version: 3.40.0
           sqlite-year: 2022
-      - name: Setup MongoDB environment
-        uses: supercharge/mongodb-github-action@1.10.0
-        with:
-          mongodb-version: "7.0"
       - name: Install dependencies
         run: npm install && npm ci
       - name: Run tests
