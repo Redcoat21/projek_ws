@@ -12,7 +12,7 @@ const Joi = require("joi");
 const { Product } = require("../../model");
 
 const getAllProduct = async (req, res) => {
-    if(req.user.role !== "ADM") {
+    if(req.user.role !== "SLR") {
         let output = await getSellerProduct(req.user.username)
         return res.status(200).json({ "Products List": output })
     }

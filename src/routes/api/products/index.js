@@ -3,7 +3,7 @@ const { getAllProduct } = require("../../../controller/api/admin")
 const { AddsellerProduct } = require("../../../controller/api/seller")
 
 module.exports = (expressApp) => ({
-    middleware: [checkAccessToken, checkRole("ADM", "SLR")],
+    middleware: [checkAccessToken],
     get: getAllProduct,
     post: AddsellerProduct
 });

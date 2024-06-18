@@ -27,6 +27,7 @@ const findAllProducts = async () => {
       description: product.description,
       price: product.price,
       seller: product.seller,
+        weight: product.weight
     }
   })
 }
