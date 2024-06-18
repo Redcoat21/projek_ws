@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
+            weight: {
+                type: DataTypes.INTEGER.UNSIGNED,
+                allowNull: false
+            }
         },
         {
             sequelize,

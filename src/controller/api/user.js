@@ -5,6 +5,7 @@ const { addTransaction, getLastTransaction, addTransactionDetail } = require("..
 const { getUser, getSubscription} = require("../../service/user");
 const { RAJAONGKIR_BASE_URL, RAJAONGKIR_API_KEY} = require("../../config");
 const localStorage = new LocalStorage("./scratch");
+const cache = new LocalStorage("./cache");
 const axios = require("axios");
 const qs = require("qs");
 const luxon = require("luxon");
@@ -12,15 +13,19 @@ const { dev: sequelize } = require("../../database");
 
 const getCart = async (req, res) => {
     let cart = JSON.parse(localStorage.getItem(`${req.user.username} cart`));
-    if(!cart) {
+
+    if(!cart || cart === null) {
         // If cart doesn't exist, then make one.
-        cart = localStorage.setItem(`${req.user.username} cart`, JSON.stringify([]));
+        localStorage.setItem(`${req.user.username} cart`, JSON.stringify([]));
+        cart = JSON.parse(localStorage.getItem(`${req.user.username} cart`));
     }
+
     return res.status(200).json(cart.map(item => ({
         product: {
             id: item.product.id,
             name: item.product.name,
-            price: `Rp. ${item.product.price.toLocaleString("id-ID")}`
+            price: `Rp. ${item.product.price.toLocaleString("id-ID")}`,
+            weight: item.product.weight
         },
         amount: item.amount,
         subtotal: `Rp. ${(item.product.price * item.amount).toLocaleString("id-ID")}`
@@ -28,7 +33,6 @@ const getCart = async (req, res) => {
 }
 
 const addToCart = async (req, res) => {
-    // localStorage.clear();
     const { error, value: validationResult } = validateCartSchema.validate(req.body);
     const results = Array.isArray(validationResult) ? validationResult : [validationResult];
 
@@ -82,24 +86,35 @@ const groupCartBySeller = (cart) => {
     return result;
 }
 
-const calculateDeliveryPrice = async (origin, destination, courierChoice) => {
-    //TODO Find a way to cache provinces and city data.
-    const provinces = (await axios.get(`${RAJAONGKIR_BASE_URL}/province`, {
+const calculateDeliveryPrice = async (origin, destination, courierChoice, totalWeight) => {
+    const provinces = JSON.parse(cache.getItem("provinces")) ?? (await axios.get(`${RAJAONGKIR_BASE_URL}/province`, {
         headers: {
             'key': RAJAONGKIR_API_KEY
         }
     })).data;
+
+    cache.setItem("provinces", JSON.stringify(provinces));
+
     const [originStreetAddress, originPostalCode, originCity, originProvince, originCountry] = origin.split(",");
     const [destinationStreetAddress, destinationPostalCode, destinationCity, destinationProvince, destinationCountry] = destination.split(",");
 
     const originProvinceId = provinces.rajaongkir.results.find(province =>  province.province === originProvince.trimStart().trimEnd()).province_id;
     const destinationProvinceId = provinces.rajaongkir.results.find(province => province.province === destinationProvince.trimStart().trimEnd()).province_id;
 
-    const cities = (await axios.get(`${RAJAONGKIR_BASE_URL}/city`, {
-        headers: {
-            'key': RAJAONGKIR_API_KEY
-        },
-    })).data;
+    const cachedCities = JSON.parse(cache.getItem("cities"));
+    let cities;
+
+    if(!cachedCities) {
+        cities = (await axios.get(`${RAJAONGKIR_BASE_URL}/city`, {
+            headers: {
+                'key': RAJAONGKIR_API_KEY
+            },
+        })).data;
+    } else {
+        cities = cachedCities
+    }
+
+    cache.setItem("cities", JSON.stringify(cities));
 
     // Horrendous code! 😭
     const originCityId = cities.rajaongkir.results.filter(province => Number(province.province_id) === Number(originProvinceId)).find(city => city.city_name === originCity.trimStart().trimEnd()).city_id;
@@ -108,7 +123,7 @@ const calculateDeliveryPrice = async (origin, destination, courierChoice) => {
     return (await axios.post(`${RAJAONGKIR_BASE_URL}/cost`, qs.stringify({
         origin: originCityId,
         destination: destinationCityId,
-        weight: 10,
+        weight: totalWeight,
         courier: courierChoice
     }), {
         headers: {
@@ -162,7 +177,9 @@ const checkout = async (req, res) => {
         for (const groupedItem of groupedCart) {
             // Because the cart is grouped based on the seller, we only need to query the seller once, and not for each group item.
             const seller = await getUser(groupedItem[0].product.seller);
-            const deliveryData = (await calculateDeliveryPrice(buyer.address, 'Jl Mangga Besar 11/8, 11170, Jakarta Barat, DKI Jakarta, Indonesia', courierChoice)).data.rajaongkir;
+            const totalWeight = groupedItem.reduce((total, current) => total += (current.product.weight * current.amount), 0);
+            console.log(totalWeight);
+            const deliveryData = (await calculateDeliveryPrice(buyer.address, 'Jl Mangga Besar 11/8, 11170, Jakarta Barat, DKI Jakarta, Indonesia', courierChoice, totalWeight)).data.rajaongkir;
             const chosenService = deliveryData.results[0].costs.find(cost => cost.service === serviceChoice);
             const deliveryPrice = chosenService.cost[0].value - (chosenService.cost[0].value * discountRate);
 
@@ -190,18 +207,23 @@ const checkout = async (req, res) => {
 
                 totalPrice += productData.price * product.amount;
             }
+            totalPrice += deliveryPrice;
         }
 
         if(buyer.balance < totalPrice) {
             await t.rollback();
-            return res.status(402).json({ message: "Insufficient Balance" });
+            return res.status(402).json({ message: "Insufficient Balance", totalPrice: `Rp. ${(totalPrice.toLocaleString("id-ID"))}` });
         }
+
+        buyer.balance -= totalPrice;
+        buyer.update();
 
         await t.commit();
         localStorage.removeItem(`${buyer.username} cart`);
-        return res.status(200).json({ message: "Checked out succesfully" });
+        return res.status(200).json({ message: "Checked out succesfully", totalPrice: `Rp. ${(totalPrice.toLocaleString("id-ID"))}` });
     } catch(error) {
         await t.rollback();
+        console.error(error);
         return res.status(500).json({ message: "Checkout failed, please contact admin" });
     }
 }
