@@ -14,7 +14,7 @@ const createUser = async (data, transaction = undefined) => {
     }
 
     try {
-        return await User.create({
+        return (await User.create({
             username,
             name,
             email,
@@ -25,7 +25,7 @@ const createUser = async (data, transaction = undefined) => {
             address
         }, {
             transaction: transaction
-        });
+        }));
     } catch (error) {
         throw new Error(error.message);
     }

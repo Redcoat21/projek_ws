@@ -1,26 +1,34 @@
 const { LocalStorage } = require("node-localstorage");
-const { validateCartSchema, validateCheckoutSchema} = require("../../validation/api/user");
+const { validateCartSchema, validateCheckoutSchema, createUserSchema, subscribeSchema } = require("../../validation/api/user");
 const { getProduct } = require("../../service/product");
 const { addTransaction, getLastTransaction, addTransactionDetail } = require("../../service/transaction");
 const { getUser, getSubscription} = require("../../service/user");
 const { RAJAONGKIR_BASE_URL, RAJAONGKIR_API_KEY} = require("../../config");
 const localStorage = new LocalStorage("./scratch");
+const cache = new LocalStorage("./cache");
 const axios = require("axios");
 const qs = require("qs");
 const luxon = require("luxon");
 const { dev: sequelize } = require("../../database");
+const { User, Product,  } = require("../../model");
+const { getSubscriptionTiers, addSubscription } = require("../../service/subscription");
+const { createUser } = require("../../service/user");
 
 const getCart = async (req, res) => {
     let cart = JSON.parse(localStorage.getItem(`${req.user.username} cart`));
-    if(!cart) {
+
+    if(!cart || cart === null) {
         // If cart doesn't exist, then make one.
-        cart = localStorage.setItem(`${req.user.username} cart`, JSON.stringify([]));
+        localStorage.setItem(`${req.user.username} cart`, JSON.stringify([]));
+        cart = JSON.parse(localStorage.getItem(`${req.user.username} cart`));
     }
+
     return res.status(200).json(cart.map(item => ({
         product: {
             id: item.product.id,
             name: item.product.name,
-            price: `Rp. ${item.product.price.toLocaleString("id-ID")}`
+            price: `Rp. ${item.product.price.toLocaleString("id-ID")}`,
+            weight: item.product.weight
         },
         amount: item.amount,
         subtotal: `Rp. ${(item.product.price * item.amount).toLocaleString("id-ID")}`
@@ -28,7 +36,6 @@ const getCart = async (req, res) => {
 }
 
 const addToCart = async (req, res) => {
-    // localStorage.clear();
     const { error, value: validationResult } = validateCartSchema.validate(req.body);
     const results = Array.isArray(validationResult) ? validationResult : [validationResult];
 
@@ -82,24 +89,35 @@ const groupCartBySeller = (cart) => {
     return result;
 }
 
-const calculateDeliveryPrice = async (origin, destination, courierChoice) => {
-    //TODO Find a way to cache provinces and city data.
-    const provinces = (await axios.get(`${RAJAONGKIR_BASE_URL}/province`, {
+const calculateDeliveryPrice = async (origin, destination, courierChoice, totalWeight) => {
+    const provinces = JSON.parse(cache.getItem("provinces")) ?? (await axios.get(`${RAJAONGKIR_BASE_URL}/province`, {
         headers: {
             'key': RAJAONGKIR_API_KEY
         }
     })).data;
+
+    cache.setItem("provinces", JSON.stringify(provinces));
+
     const [originStreetAddress, originPostalCode, originCity, originProvince, originCountry] = origin.split(",");
     const [destinationStreetAddress, destinationPostalCode, destinationCity, destinationProvince, destinationCountry] = destination.split(",");
 
     const originProvinceId = provinces.rajaongkir.results.find(province =>  province.province === originProvince.trimStart().trimEnd()).province_id;
     const destinationProvinceId = provinces.rajaongkir.results.find(province => province.province === destinationProvince.trimStart().trimEnd()).province_id;
 
-    const cities = (await axios.get(`${RAJAONGKIR_BASE_URL}/city`, {
-        headers: {
-            'key': RAJAONGKIR_API_KEY
-        },
-    })).data;
+    const cachedCities = JSON.parse(cache.getItem("cities"));
+    let cities;
+
+    if(!cachedCities) {
+        cities = (await axios.get(`${RAJAONGKIR_BASE_URL}/city`, {
+            headers: {
+                'key': RAJAONGKIR_API_KEY
+            },
+        })).data;
+    } else {
+        cities = cachedCities
+    }
+
+    cache.setItem("cities", JSON.stringify(cities));
 
     // Horrendous code! 😭
     const originCityId = cities.rajaongkir.results.filter(province => Number(province.province_id) === Number(originProvinceId)).find(city => city.city_name === originCity.trimStart().trimEnd()).city_id;
@@ -108,7 +126,7 @@ const calculateDeliveryPrice = async (origin, destination, courierChoice) => {
     return (await axios.post(`${RAJAONGKIR_BASE_URL}/cost`, qs.stringify({
         origin: originCityId,
         destination: destinationCityId,
-        weight: 10,
+        weight: totalWeight,
         courier: courierChoice
     }), {
         headers: {
@@ -157,11 +175,14 @@ const checkout = async (req, res) => {
 
     const t = await sequelize.transaction();
 
+    let totalPrice = 0;
     try {
         for (const groupedItem of groupedCart) {
             // Because the cart is grouped based on the seller, we only need to query the seller once, and not for each group item.
             const seller = await getUser(groupedItem[0].product.seller);
-            const deliveryData = (await calculateDeliveryPrice(buyer.address, 'Jl Mangga Besar 11/8, 11170, Jakarta Barat, DKI Jakarta, Indonesia', courierChoice)).data.rajaongkir;
+            const totalWeight = groupedItem.reduce((total, current) => total += (current.product.weight * current.amount), 0);
+            console.log(totalWeight);
+            const deliveryData = (await calculateDeliveryPrice(buyer.address, 'Jl Mangga Besar 11/8, 11170, Jakarta Barat, DKI Jakarta, Indonesia', courierChoice, totalWeight)).data.rajaongkir;
             const chosenService = deliveryData.results[0].costs.find(cost => cost.service === serviceChoice);
             const deliveryPrice = chosenService.cost[0].value - (chosenService.cost[0].value * discountRate);
 
@@ -186,19 +207,183 @@ const checkout = async (req, res) => {
                     subtotal: productData.price * product.amount,
                     deliveryDate: luxon.DateTime.now().plus(Number(estimatedTime))
                 }, t)
+
+                totalPrice += productData.price * product.amount;
             }
+            totalPrice += deliveryPrice;
         }
+
+        if(buyer.balance < totalPrice) {
+            await t.rollback();
+            return res.status(402).json({ message: "Insufficient Balance", totalPrice: `Rp. ${(totalPrice.toLocaleString("id-ID"))}` });
+        }
+
+        buyer.balance -= totalPrice;
+        buyer.update();
+
         await t.commit();
         localStorage.removeItem(`${buyer.username} cart`);
-        return res.status(200).json({ message: "Checked out succesfully" });
+        return res.status(200).json({ message: "Checked out succesfully", totalPrice: `Rp. ${(totalPrice.toLocaleString("id-ID"))}` });
     } catch(error) {
         await t.rollback();
+        console.error(error);
         return res.status(500).json({ message: "Checkout failed, please contact admin" });
     }
 }
 
+const getManyUser = async (req, res) => {
+    try {
+        const users = await User.findAll({
+            attributes: ["username", "name", "email", "role"], // Hanya pilih kolom tertentu
+        });
+
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("Unable to connect to the database:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+const getOneUser = async (req, res) => {
+    if(req.user.role !== "ADM") {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+    try {
+
+        const user = await User.findOne({
+            attributes: ["username", "name", "email"], // Hanya pilih kolom tertentu
+            where: {
+                username: req.params.id,
+            },
+        });
+
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).send("User not found");
+        }
+    } catch (error) {
+        console.error("Unable to connect to the database:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+const createOneUser = async (req, res) => {
+    try {
+        const { error, value } = createUserSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
+        }
+
+        const { username, name, email, password, phone, role, address } = value;
+
+        const newUser = await createUser({ username, name, email, password, phone, role, address });
+
+        // const newUser = await User.create({
+        //     username,
+        //     name,
+        //     email,
+        //     , // Password disimpan tanpa hashing
+        //     phone_number,
+        //     role: "USR", // Asumsikan 'USR' adalah id untuk role 'user'
+        //     balance: 0,
+        // });
+
+        res.status(201).json({
+            message: "User created successfully",
+            user: {
+                username: newUser.username,
+                name: newUser.name,
+                email: newUser.email,
+                balance: newUser.balance,
+                created_at: newUser.created_at,
+            },
+        });
+    } catch (error) {
+        console.error(error);
+        if (error.name === "SequelizeUniqueConstraintError") {
+            return res
+                .status(409)
+                .json({ error: "Username or email already exists" });
+        }
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+const deleteOneUser = async (req, res) => {
+    if(req.user.role !== "ADM") {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const username = req.params.id; // menggunakan username sebagai id
+
+    try {
+        // Cari user
+        const user = await User.findByPk(username);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Hapus semua produk yang terkait dengan pengguna
+        // await Product.destroy({
+        //     where: { seller: username },
+        //     force: true, // Ini akan menghapus secara permanen, bukan soft delete
+        // });
+
+        // Hapus pengguna
+        await user.destroy();
+
+        res.status(200).json({
+            message: "User and related products deleted successfully",
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+const subscribe = async (req, res) => {
+    const tiers = await getSubscriptionTiers();
+    const subscriber = await getUser(req.user.username);
+
+    const { value, error } = subscribeSchema.validate(req.body);
+
+    if(error) {
+        return res.status(400).json({ message: error.message });
+    }
+
+    const { tier } = value;
+
+    const subscriptionTier = tiers.find(st => st.name === tier);
+
+    if(!subscriptionTier) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if(subscriber.balance < subscriptionTier.price) {
+        return res.status(402).json({message: "Insufficient balance"});
+
+    }
+
+    await addSubscription({
+        tier: subscriptionTier.id,
+        subscriber: req.user.username
+    })
+
+    subscriber.balance -= subscriptionTier.price;
+    subscriber.update();
+
+    return res.status(200).json({ message: "Subscribed succesfully", expiredAt: luxon.DateTime.now().plus({months: 1})});
+};
+
 module.exports = {
     getCart,
     addToCart,
-    checkout
+    checkout,
+    getManyUser,
+    getOneUser,
+    createOneUser,
+    deleteOneUser,
+    subscribe
 }

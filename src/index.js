@@ -31,7 +31,7 @@ const autoroutes = require("express-automatic-routes").default;
                 chalk.bold(
                     chalk.bgBlue("[APP INFO]:"),
                     chalk.blue("Server is running on port: ") +
-                        chalk.green(`http://${APP_HOST}:${APP_PORT}`)
+                        chalk.green(`${APP_PORT}`)
                 )
             );
         });

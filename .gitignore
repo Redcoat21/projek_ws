@@ -4,3 +4,4 @@ bun.*
 .idea/
 /scratch/
 /src/uploads/
+/cache/

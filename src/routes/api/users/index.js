@@ -1,7 +1,7 @@
-const { checkAccessToken } = require("../../../middleware/token");
-
+const { checkAccessToken, checkRole } = require("../../../middleware/token");
+const { getManyUser, createOneUser } = require("../../../controller/api/user");
 module.exports = (expressApp) => ({
-    get: (request, response) => {
-        response.status(200).send("Hello, Route").end();
-    },
+    middleware: [checkAccessToken, checkRole("ADM")],
+    get: getManyUser,
+    post: createOneUser
 });

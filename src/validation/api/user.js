@@ -29,7 +29,27 @@ const validateCheckoutSchema = Joi.object({
     })
 });
 
+const createUserSchema = Joi.object({
+    username: Joi.string().required(),
+    name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+    phone: Joi.string().required(),
+    address: Joi.string().pattern(
+        /^.+?,\s*\d{5},\s*.+?,\s*.+?,\s*.+?$/
+    ),
+    role: Joi.string()
+});
+
+const subscribeSchema = Joi.object({
+    tier: Joi.string().valid("Premium", "Silver", "Gold").required().messages({
+        "any.only": "Valid tiers are Premium, Silver, Gold"
+    })
+})
+
 module.exports = {
     validateCartSchema,
-    validateCheckoutSchema
+    validateCheckoutSchema,
+    createUserSchema,
+    subscribeSchema
 }

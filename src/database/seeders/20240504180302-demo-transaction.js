@@ -3,7 +3,7 @@ const { fakerID_ID: faker } = require("@faker-js/faker");
 /** @type {import('sequelize-cli').Migration} */
 const { User } = require("../../model");
 const { DateTime } = require("luxon");
-const { addressGenerator } = require("../../utility/address");
+const { addressGenerator } = require("../../../utility/address");
 
 module.exports = {
     async up(queryInterface, Sequelize) {
